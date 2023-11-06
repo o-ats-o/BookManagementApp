@@ -75,12 +75,16 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    // Retrofit with Scalar Converter
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+
 
     // Room
     implementation("androidx.room:room-runtime:2.3.0")
     implementation("androidx.room:room-ktx:2.3.0")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.4.2")
 
 }
