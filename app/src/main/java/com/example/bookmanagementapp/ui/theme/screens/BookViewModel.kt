@@ -9,7 +9,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.network.BookApi
-import com.example.bookmanagementapp.ui.theme.isbn
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -26,7 +25,7 @@ class BookViewModel : ViewModel() {
         private set
 
     /**
-     * Call getBookPhotos() on init so we can display status immediately.
+     * Call getBookInfo() on init so we can display status immediately.
      */
     init {
         getBookInfo()
@@ -37,7 +36,7 @@ class BookViewModel : ViewModel() {
         viewModelScope.launch {
             bookUiState = BookUiState.Loading
             bookUiState = try {
-                val listResult = BookApi.retrofitService.getBookInfo(isbn)
+                val listResult = BookApi.retrofitService.getInfo()
                 BookUiState.Success(
                     "Success: ${listResult.size} Book retrieved"
                 )

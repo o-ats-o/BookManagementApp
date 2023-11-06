@@ -34,8 +34,7 @@ fun IsbnScanner(navController: NavController) {
         } else {
             if (result.contents.startsWith("978")) {
                 isbn = result.contents
-                navController.navigate("bookInformation")
-
+                navController.navigate("bookInfo")
             } else {
                 Toast.makeText(
                     context,
