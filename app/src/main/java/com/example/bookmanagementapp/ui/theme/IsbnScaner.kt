@@ -38,7 +38,7 @@ fun IsbnScanner(navController: NavController) {
             } else {
                 Toast.makeText(
                     context,
-                    "Not ISBN: ",
+                    "NOT ISBN: ",
                     Toast.LENGTH_LONG
                 )
                     .show()
