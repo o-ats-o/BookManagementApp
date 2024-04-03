@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.example.bookmanagementapp.ui.theme
+package com.example.bookmanagementapp
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -9,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +20,6 @@ import androidx.navigation.NavController
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 
-var isbn = ""
 @Composable
 fun IsbnScanner(navController: NavController) {
     val context = LocalContext.current
@@ -33,9 +29,10 @@ fun IsbnScanner(navController: NavController) {
                 .show()
         } else {
             if (result.contents.startsWith("978")) {
-                isbn = result.contents
-                navController.navigate("bookInformation")
-
+                val isbn = result.contents
+                Toast.makeText(context, "Scanned ISBN: $isbn", Toast.LENGTH_LONG).show()
+                // BookInfoScreenに遷移
+                navController.navigate("bookInformation/$isbn")
             } else {
                 Toast.makeText(
                     context,

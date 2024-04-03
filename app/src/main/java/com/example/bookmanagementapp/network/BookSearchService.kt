@@ -1,37 +1,37 @@
 package com.example.bookmanagementapp.network
 
-import com.example.bookmanagementapp.model.BookInfo
+import com.example.bookmanagementapp.model.BookResponse
+import com.squareup.moshi.Moshi
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.Query
 
 private const val BASE_URL =
     "https://www.googleapis.com"
 
-/**
- * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter
- */
+//　Moshiのインスタンスを作成
+private val moshi =
+    Moshi.Builder()
+        .add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory())
+        .build()
+
+// Retrofitのインスタンスを作成
 private val retrofit = Retrofit.Builder()
-    .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(BASE_URL)
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
     .build()
 
-/**
- * Retrofit service object for creating api calls
- */
+val service: BookApiService = retrofit.create(BookApiService::class.java)
+
 interface BookApiService {
-    @GET("/books/v1/volumes?q=isbn:{isbn}")
+    @GET("books/v1/volumes")
     suspend fun getBookInfo(
-        @Path("isbn") isbn: String
-    ): List<BookInfo>
+        @Query("q") query: String
+    ): Response<BookResponse>
 }
 
 /**
  * A public Api object that exposes the lazy-initialized Retrofit service
  */
-object BookApi {
-    val retrofitService: BookApiService by lazy {
-        retrofit.create(BookApiService::class.java)
-    }
-}
