@@ -1,50 +1,33 @@
 package com.example.bookmanagementapp.ui.theme.screens
 
-import android.net.http.HttpException
-import android.os.Build
-import androidx.annotation.RequiresExtension
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookmanagementapp.network.BookApi
-import com.example.bookmanagementapp.ui.theme.isbn
+import com.example.bookmanagementapp.model.BookInfo
+import com.example.bookmanagementapp.model.BookResponse
+import com.example.bookmanagementapp.network.BookApiService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
+import retrofit2.Response
 
-sealed interface BookUiState {
-    data class Success(val info: String) : BookUiState
-    object Error : BookUiState
-    object Loading : BookUiState
-}
 
-@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-class BookViewModel : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
-    var bookUiState: BookUiState by mutableStateOf(BookUiState.Loading)
-        private set
+class BookViewModel(private val bookApiService: BookApiService) : ViewModel() {
 
-    /**
-     * Call getBookPhotos() on init so we can display status immediately.
-     */
-    init {
-        getBookInfo()
-    }
+    private val _bookInfoState: MutableStateFlow<BookInfo?> = MutableStateFlow(null)
+    val bookInfoState: StateFlow<BookInfo?> get() = _bookInfoState
 
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun getBookInfo() {
+    fun getBookInfo(isbn: String) {
         viewModelScope.launch {
-            bookUiState = BookUiState.Loading
-            bookUiState = try {
-                val listResult = BookApi.retrofitService.getBookInfo(isbn)
-                BookUiState.Success(
-                    "Success: ${listResult.size} Book retrieved"
-                )
-            } catch (e: IOException) {
-                BookUiState.Error
-            } catch (e: HttpException) {
-                BookUiState.Error
+            val response: Response<BookResponse> = bookApiService.getBookInfo("isbn:$isbn")
+            if (response.isSuccessful) {
+                Log.d("BookViewModel", "response: ${response.body()}")
+                val bookResponse: BookResponse? = response.body()
+                val bookInfo: BookInfo? = bookResponse?.items?.firstOrNull()?.volumeInfo
+                _bookInfoState.value = bookInfo
+            }else{
+                val errorBody = response.errorBody()?.string()
+                Log.e("BookViewModel", "response: $errorBody")
             }
         }
     }
