@@ -46,8 +46,16 @@ fun IsbnScanner(navController: NavController) {
 
     Scaffold (
         floatingActionButton = {
+            // スキャンオプションの設定
+            val scanOptions = ScanOptions().apply {
+                setOrientationLocked(false)
+                setPrompt("バーコードを画面の読み取り範囲内に写すとスキャンします")
+            }
+            // フローティングアクションボタン
             FloatingActionButton(
-                onClick = { barcodeLauncher.launch(ScanOptions()) },
+                onClick = {
+                    barcodeLauncher.launch(scanOptions)
+                          },
                 shape = MaterialTheme.shapes.medium,
             ) {
                 Icon(
