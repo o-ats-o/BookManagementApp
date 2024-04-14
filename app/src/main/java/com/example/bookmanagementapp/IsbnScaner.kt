@@ -48,8 +48,9 @@ fun IsbnScanner(navController: NavController) {
         floatingActionButton = {
             // スキャンオプションの設定
             val scanOptions = ScanOptions().apply {
+                setCaptureActivity(CustomScannerActivity::class.java)
                 setOrientationLocked(false)
-                setPrompt("バーコードを画面の読み取り範囲内に写すとスキャンします")
+                setPrompt("")
             }
             // フローティングアクションボタン
             FloatingActionButton(

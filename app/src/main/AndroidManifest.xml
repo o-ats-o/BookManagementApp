@@ -45,6 +45,11 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             tools:ignore="DiscouragedApi">
         </activity>
+
+        <activity
+            android:name=".CustomScannerActivity"
+            android:theme="@style/Theme.AppCompat"> <!-- Use Theme.AppCompat or a descendant -->
+        </activity>
     </application>
 
 </manifest>

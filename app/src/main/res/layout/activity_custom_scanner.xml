@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/zxing_barcode_scanner"
+        android:layout_width="380dp"
+        android:layout_height="180dp"
+        android:layout_centerInParent="true"
+        app:zxing_use_texture_view="true"
+        app:zxing_preview_scaling_strategy="centerCrop" />
+
+    <com.journeyapps.barcodescanner.ViewfinderView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/zxing_viewfinder_view"
+        app:zxing_possible_result_points="@color/zxing_custom_possible_result_points"
+        app:zxing_result_view="@color/zxing_custom_result_view"
+        app:zxing_viewfinder_laser="@color/zxing_custom_viewfinder_laser"
+        app:zxing_viewfinder_laser_visibility="true"
+        app:zxing_viewfinder_mask="@color/zxing_custom_viewfinder_mask"/>
+
+    <TextView
+        android:id="@+id/scan_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/zxing_barcode_scanner"
+        android:layout_alignBottom="@+id/zxing_barcode_scanner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:layout_marginBottom="-40dp"
+        android:text="@string/barcode_scanner_label"
+        android:textSize="14sp" />
+
+</RelativeLayout>
