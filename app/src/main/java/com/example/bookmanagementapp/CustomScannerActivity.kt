@@ -67,13 +67,13 @@ class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchLis
         return barcodeScannerView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
     }
 
-    fun changeMaskColor() {
+    private fun changeMaskColor() {
         val rnd = Random()
         val color = Color.argb(100, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         viewfinderView.setMaskColor(color)
     }
 
-    fun changeLaserVisibility(visible: Boolean) {
+    private fun changeLaserVisibility(visible: Boolean) {
         viewfinderView.setLaserVisibility(visible)
     }
 
@@ -84,11 +84,11 @@ class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchLis
 
     @SuppressLint("SetTextI18n")
     override fun onTorchOn() {
-        switchFlashlightButton.setText("TURN OFF FLASH")
+        switchFlashlightButton.text = "TURN OFF FLASH"
     }
 
     @SuppressLint("SetTextI18n")
     override fun onTorchOff() {
-        switchFlashlightButton.setText("TURN ON FLASH")
+        switchFlashlightButton.text = "TURN ON FLASH"
     }
 }
