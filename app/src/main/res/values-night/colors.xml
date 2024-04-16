@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="barcode_reader_background">#000000</color> <!-- 黒色 -->
+    <!-- 他の色定義 -->
+</resources>
