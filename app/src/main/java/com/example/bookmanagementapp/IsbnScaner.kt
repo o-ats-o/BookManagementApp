@@ -58,6 +58,7 @@ fun IsbnScanner(navController: NavController) {
                     barcodeLauncher.launch(scanOptions)
                           },
                 shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
             ) {
                 Icon(
                     Icons.Default.Add, contentDescription = "Add"
