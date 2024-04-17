@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -115,7 +114,6 @@ fun BookCover(
 }
 
 // 書籍情報のテキストフィールド
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookField(
     value: MutableState<String>,
@@ -145,9 +143,9 @@ fun BookField(
                 }
             },
             // テキストフィールドに1文字も入っていない時，テキストフィールドの下線を赤く，それ以外は元々の色
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
-                unfocusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray
+                unfocusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
             )
         )
 
