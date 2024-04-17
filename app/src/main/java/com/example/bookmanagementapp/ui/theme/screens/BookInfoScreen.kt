@@ -59,10 +59,14 @@ fun BookInfoScreen(
 // 書籍情報のレイアウト
 @Composable
 fun BookInfoLayout(bookInfo: BookInfo?, modifier: Modifier = Modifier) {
+    // 書籍情報の各項目を保持する
     val title = remember { mutableStateOf(bookInfo?.title?: "") }
     val authors = remember { mutableStateOf(bookInfo?.authors?.joinToString(", ") ?: "") }
     val description = remember { mutableStateOf(bookInfo?.description?: "") }
     val pageCount = remember { mutableStateOf(bookInfo?.pageCount?.toString()?: "") }
+
+    // 全てのテキストフィールドが空でないかどうか
+    val isNotEmpty = title.value.isNotEmpty() && authors.value.isNotEmpty() && description.value.isNotEmpty() && pageCount.value.isNotEmpty()
 
     LazyColumn (
         modifier = modifier
@@ -78,7 +82,7 @@ fun BookInfoLayout(bookInfo: BookInfo?, modifier: Modifier = Modifier) {
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { BookField(pageCount, "総ページ数") { newValue -> pageCount.value = newValue } }
         item { Spacer(modifier = Modifier.height(38.dp)) }
-        item { BookInfoSaveButton() }
+        item { BookInfoSaveButton(isNotEmpty) }
     }
 }
 
@@ -165,7 +169,8 @@ fun BookField(
 // 書籍情報保存ボタン
 @Composable
 fun BookInfoSaveButton(
-    modifier: Modifier = Modifier
+    isNotEmpty: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -176,7 +181,8 @@ fun BookInfoSaveButton(
             onClick = { /*TODO*/ },
             modifier = modifier
                 .width(120.dp)
-                .height(40.dp)
+                .height(40.dp),
+            enabled = isNotEmpty
         ) {
             Text("保存")
         }
