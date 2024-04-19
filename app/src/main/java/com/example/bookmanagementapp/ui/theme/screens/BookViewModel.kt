@@ -1,38 +1,47 @@
 package com.example.bookmanagementapp.ui.theme.screens
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.model.BookInfo
-import com.example.bookmanagementapp.model.BookResponse
 import com.example.bookmanagementapp.network.BookApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
 
+sealed class BookInfoViewState<out T> {
+    object Loading : BookInfoViewState<Nothing>()
+    data class Success<T>(val data: T) : BookInfoViewState<T>()
+    data class Error(val message: String) : BookInfoViewState<Nothing>()
+}
 
 class BookViewModel(private val bookApiService: BookApiService) : ViewModel() {
+    private var job: Job? = null
 
-    private val _bookInfoState: MutableStateFlow<BookInfo?> = MutableStateFlow(null)
-    val bookInfoState: StateFlow<BookInfo?> get() = _bookInfoState
-
-    private var currentJob: Job? = null
+    private val _bookInfoState = MutableStateFlow<BookInfoViewState<BookInfo>>(BookInfoViewState.Loading)
+    val bookInfoState: StateFlow<BookInfoViewState<BookInfo>> = _bookInfoState
 
     fun getBookInfo(isbn: String) {
-        currentJob?.cancel()
-        currentJob = viewModelScope.launch(Dispatchers.IO) {
-            val response: Response<BookResponse> = bookApiService.getBookInfo("isbn:$isbn")
-            if (response.isSuccessful) {
-                Log.d("BookViewModel", "response: ${response.body()}")
-                val bookResponse: BookResponse? = response.body()
-                val bookInfo: BookInfo? = bookResponse?.items?.firstOrNull()?.volumeInfo
-                _bookInfoState.value = bookInfo
-            }else{
-                val errorBody = response.errorBody()?.string()
-                Log.e("BookViewModel", "response: $errorBody")
+        job?.cancel()
+        // APIから書籍情報を取得するのでIOスレッドで実行
+        job = viewModelScope.launch(Dispatchers.IO) {
+            _bookInfoState.value = BookInfoViewState.Loading
+            try {
+                val response = bookApiService.getBookInfo("isbn:$isbn")
+                if (response.isSuccessful) {
+                    val bookResponse = response.body()
+                    val bookInfo = bookResponse?.items?.firstOrNull()?.volumeInfo
+                    if (bookInfo != null) {
+                        _bookInfoState.value = BookInfoViewState.Success(bookInfo)
+                    } else {
+                        throw Exception("Book info not found")
+                    }
+                } else {
+                    throw Exception("Error: ${response.message()}")
+                }
+            } catch (exception: Exception) {
+                _bookInfoState.value = BookInfoViewState.Error(exception.message ?: "Unknown error")
             }
         }
     }

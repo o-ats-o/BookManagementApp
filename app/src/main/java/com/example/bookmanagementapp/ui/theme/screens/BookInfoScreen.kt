@@ -1,5 +1,6 @@
 package com.example.bookmanagementapp.ui.theme.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,10 +50,23 @@ fun BookInfoScreen(
         viewMode.getBookInfo(isbn)
     }
 
-    val bookInfo = bookInfoState.value
-    if (bookInfo != null) {
-        Column(modifier = modifier) {
-            BookInfoLayout(bookInfo)
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        when (val state = bookInfoState.value) {
+            is BookInfoViewState.Loading -> {
+                // Progress varを表示
+                CircularProgressIndicator()
+            }
+            is BookInfoViewState.Success -> {
+                BookInfoLayout(state.data)
+            }
+            is BookInfoViewState.Error -> {
+                // エラーメッセージをログに表示
+                Log.e("BookInfoScreen", "Error: ${state.message}")
+            }
         }
     }
 }
@@ -189,6 +204,25 @@ fun BookInfoSaveButton(
     }
 }
 
+// エラー画面のレイアウト
+@Composable
+fun ErrorLayout(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            modifier = modifier.padding(16.dp),
+            fontSize = 16.sp
+        )
+    }
+}
+
 // 書籍情報レイアウトのプレビュー
 @Preview
 @Composable
@@ -199,8 +233,15 @@ val bookInfo = BookInfo(
         description = "書籍概要",
         pageCount = 100,
         imageLinks = ImageLinks(
-            thumbnail = "http://books.google.com/books/content?id=L_ggEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+            thumbnail = ""
         )
     )
     BookInfoLayout(bookInfo)
+}
+
+// エラーレイアウトのプレビュー
+@Preview
+@Composable
+fun PreviewErrorLayout() {
+    ErrorLayout("エラーが発生しました")
 }
