@@ -28,7 +28,7 @@ fun IsbnScanner(navController: NavController) {
             Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG)
                 .show()
         } else {
-            if (result.contents.startsWith("978")) {
+            if (result.contents.startsWith("97")) {
                 val isbn = result.contents
                 Toast.makeText(context, "Scanned ISBN: $isbn", Toast.LENGTH_LONG).show()
                 // BookInfoScreenに遷移
