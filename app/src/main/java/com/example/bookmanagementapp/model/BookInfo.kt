@@ -1,5 +1,8 @@
 package com.example.bookmanagementapp.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 data class BookResponse(
     val kind: String,
     val totalItems: Int,
@@ -20,5 +23,15 @@ data class BookInfo(
 )
 
 data class ImageLinks(
+    val thumbnail: String?
+)
+
+@Entity
+data class BookInfoEntity(
+    @PrimaryKey val isbn: String,
+    val title: String?,
+    val authors: String?,
+    val description: String?,
+    val pageCount: Int?,
     val thumbnail: String?
 )

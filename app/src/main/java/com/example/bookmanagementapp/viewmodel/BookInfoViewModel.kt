@@ -1,14 +1,18 @@
-package com.example.bookmanagementapp.ui.theme.screens
+package com.example.bookmanagementapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bookmanagementapp.dao.BookDao
 import com.example.bookmanagementapp.model.BookInfo
+import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.network.BookApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed class BookInfoViewState<out T> {
     object Loading : BookInfoViewState<Nothing>()
@@ -16,7 +20,11 @@ sealed class BookInfoViewState<out T> {
     data class Error(val message: String) : BookInfoViewState<Nothing>()
 }
 
-class BookViewModel(private val bookApiService: BookApiService) : ViewModel() {
+@HiltViewModel
+class BookInfoViewModel @Inject constructor(
+    private val bookApiService: BookApiService,
+    private val bookDao: BookDao
+) : ViewModel() {
     private var job: Job? = null
 
     private val _bookInfoState = MutableStateFlow<BookInfoViewState<BookInfo>>(BookInfoViewState.Loading)
@@ -43,6 +51,20 @@ class BookViewModel(private val bookApiService: BookApiService) : ViewModel() {
             } catch (exception: Exception) {
                 _bookInfoState.value = BookInfoViewState.Error(exception.message ?: "Unknown error")
             }
+        }
+    }
+
+    fun saveBookInfoToLocalDatabase(bookInfo: BookInfo) {
+        val bookInfoEntity = BookInfoEntity(
+            isbn = "isbn", // Replace with actual ISBN
+            title = bookInfo.title,
+            authors = bookInfo.authors?.joinToString(", "),
+            description = bookInfo.description,
+            pageCount = bookInfo.pageCount,
+            thumbnail = bookInfo.imageLinks?.thumbnail
+        )
+        viewModelScope.launch {
+            bookDao.insertBook(bookInfoEntity)
         }
     }
 }

@@ -8,14 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.bookmanagementapp.network.service
-import com.example.bookmanagementapp.ui.theme.BookManagementAppTheme
-import com.example.bookmanagementapp.ui.theme.screens.BookInfoScreen
-import com.example.bookmanagementapp.ui.theme.screens.BookViewModel
+import com.example.bookmanagementapp.view.screen.BookInfoScreen
+import com.example.bookmanagementapp.view.theme.BookManagementAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,16 +35,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainNavHost(navController: NavHostController) {
-    val bookViewModel = BookViewModel(service)
-
+fun MainNavHost(
+    navController: NavHostController
+) {
     NavHost(navController = navController, startDestination = "isbnScanner") {
         composable("isbnScanner") {
             IsbnScanner( navController)
         }
         composable("bookInformation/{isbn}") {backStackEntry ->
             val isbn = backStackEntry.arguments?.getString("isbn") ?: ""
-            BookInfoScreen(bookViewModel, isbn)
+            BookInfoScreen(isbn = isbn, viewModel = hiltViewModel())
         }
     }
 }

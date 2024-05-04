@@ -1,4 +1,4 @@
-package com.example.bookmanagementapp.ui.theme.screens
+package com.example.bookmanagementapp.view.screen
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -32,22 +32,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.bookmanagementapp.model.BookInfo
 import com.example.bookmanagementapp.model.ImageLinks
+import com.example.bookmanagementapp.viewmodel.BookInfoViewModel
+import com.example.bookmanagementapp.viewmodel.BookInfoViewState
 
 @Composable
 fun BookInfoScreen(
-    viewMode: BookViewModel,
+    modifier: Modifier = Modifier,
     isbn: String,
-    modifier: Modifier = Modifier
+    viewModel: BookInfoViewModel = hiltViewModel(),
 ){
-    val bookInfoState = viewMode.bookInfoState.collectAsState()
+    val bookInfoState = viewModel.bookInfoState.collectAsState()
 
     LaunchedEffect(isbn) {
-        viewMode.getBookInfo(isbn)
+        viewModel.getBookInfo(isbn)
     }
 
     Box(
@@ -61,7 +64,12 @@ fun BookInfoScreen(
                 CircularProgressIndicator()
             }
             is BookInfoViewState.Success -> {
-                BookInfoLayout(state.data)
+                BookInfoLayout(
+                    state.data,
+                    onSaveBookInfo = {
+                        viewModel.saveBookInfoToLocalDatabase(state.data)
+                    }
+                )
             }
             is BookInfoViewState.Error -> {
                 // エラーメッセージをログに表示
@@ -73,7 +81,12 @@ fun BookInfoScreen(
 
 // 書籍情報のレイアウト
 @Composable
-fun BookInfoLayout(bookInfo: BookInfo?, modifier: Modifier = Modifier) {
+fun BookInfoLayout(
+    bookInfo: BookInfo?,
+    onSaveBookInfo: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
     // 書籍情報の各項目を保持する
     val title = remember { mutableStateOf(bookInfo?.title?: "") }
     val authors = remember { mutableStateOf(bookInfo?.authors?.joinToString(", ") ?: "") }
@@ -97,7 +110,7 @@ fun BookInfoLayout(bookInfo: BookInfo?, modifier: Modifier = Modifier) {
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { BookField(pageCount, "総ページ数") { newValue -> pageCount.value = newValue } }
         item { Spacer(modifier = Modifier.height(38.dp)) }
-        item { BookInfoSaveButton(isNotEmpty) }
+        item { BookInfoSaveButton(isNotEmpty, onSaveBookInfo) }
     }
 }
 
@@ -185,6 +198,7 @@ fun BookField(
 @Composable
 fun BookInfoSaveButton(
     isNotEmpty: Boolean,
+    onSaveBookInfo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -193,7 +207,7 @@ fun BookInfoSaveButton(
         contentAlignment = Alignment.Center
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onSaveBookInfo() },
             modifier = modifier
                 .width(120.dp)
                 .height(40.dp),
@@ -236,7 +250,7 @@ val bookInfo = BookInfo(
             thumbnail = ""
         )
     )
-    BookInfoLayout(bookInfo)
+    BookInfoLayout(bookInfo, onSaveBookInfo = {})
 }
 
 // エラーレイアウトのプレビュー

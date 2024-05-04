@@ -1,4 +1,4 @@
-package com.example.bookmanagementapp.ui.theme
+package com.example.bookmanagementapp.view.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

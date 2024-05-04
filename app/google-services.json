@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "31949884310",
+    "project_id": "libraloop-7c16a",
+    "storage_bucket": "libraloop-7c16a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31949884310:android:ca5f2dcbd240b19f5cebb7",
+        "android_client_info": {
+          "package_name": "com.example.bookmanagementapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfX4UdHMc5TJ55BsgJ-MI_RTh19eqelgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
