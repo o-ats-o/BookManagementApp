@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class BookInfoViewState<out T> {
-    object Loading : BookInfoViewState<Nothing>()
+    data object Loading : BookInfoViewState<Nothing>()
     data class Success<T>(val data: T) : BookInfoViewState<T>()
     data class Error(val message: String) : BookInfoViewState<Nothing>()
 }
@@ -54,9 +54,9 @@ class BookInfoViewModel @Inject constructor(
         }
     }
 
-    fun saveBookInfoToLocalDatabase(bookInfo: BookInfo) {
+    fun saveBookInfoToLocalDatabase(isbn: String, bookInfo: BookInfo) {
         val bookInfoEntity = BookInfoEntity(
-            isbn = "isbn", // Replace with actual ISBN
+            isbn = isbn,
             title = bookInfo.title,
             authors = bookInfo.authors?.joinToString(", "),
             description = bookInfo.description,

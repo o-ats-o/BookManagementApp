@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
@@ -45,6 +46,7 @@ import com.example.bookmanagementapp.viewmodel.BookInfoViewState
 fun BookInfoScreen(
     modifier: Modifier = Modifier,
     isbn: String,
+    navController: NavHostController,
     viewModel: BookInfoViewModel = hiltViewModel(),
 ){
     val bookInfoState = viewModel.bookInfoState.collectAsState()
@@ -67,7 +69,8 @@ fun BookInfoScreen(
                 BookInfoLayout(
                     state.data,
                     onSaveBookInfo = {
-                        viewModel.saveBookInfoToLocalDatabase(state.data)
+                        viewModel.saveBookInfoToLocalDatabase(isbn ,state.data)
+                        navController.navigate("isbnScanner")
                     }
                 )
             }

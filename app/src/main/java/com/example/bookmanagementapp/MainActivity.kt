@@ -42,11 +42,11 @@ fun MainNavHost(
 ) {
     NavHost(navController = navController, startDestination = "isbnScanner") {
         composable("isbnScanner") {
-            IsbnScanner( navController)
+            IsbnScanner(navController)
         }
-        composable("bookInformation/{isbn}") {backStackEntry ->
+        composable("bookInformation/{isbn}") { backStackEntry ->
             val isbn = backStackEntry.arguments?.getString("isbn") ?: ""
-            BookInfoScreen(isbn = isbn, viewModel = hiltViewModel())
+            BookInfoScreen(isbn = isbn, navController = navController, viewModel = hiltViewModel())
         }
     }
 }

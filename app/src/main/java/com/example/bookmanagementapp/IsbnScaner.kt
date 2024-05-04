@@ -11,7 +11,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,16 +29,9 @@ fun IsbnScanner(navController: NavController) {
                 .show()
         } else {
             if (result.contents.startsWith("97")) {
-                val isbn = result.contents
-                Toast.makeText(context, "Scanned ISBN: $isbn", Toast.LENGTH_LONG).show()
-                // BookInfoScreenに遷移
-                navController.navigate("bookInformation/$isbn")
+                navController.navigate("bookInformation/${result.contents}")
             } else {
-                Toast.makeText(
-                    context,
-                    "Not ISBN: ",
-                    Toast.LENGTH_LONG
-                )
+                Toast.makeText(context, "Invalid ISBN", Toast.LENGTH_LONG)
                     .show()
             }
         }
@@ -57,7 +49,7 @@ fun IsbnScanner(navController: NavController) {
             FloatingActionButton(
                 onClick = {
                     barcodeLauncher.launch(scanOptions)
-                          },
+                },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
             ) {
@@ -72,11 +64,6 @@ fun IsbnScanner(navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Barcode Reader App"
-            )
-
             BookListScreen()
         }
     }
