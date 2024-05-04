@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.bookmanagementapp.view.screen.BookListScreen
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 
@@ -75,6 +76,8 @@ fun IsbnScanner(navController: NavController) {
                 modifier = Modifier.padding(8.dp),
                 text = "Barcode Reader App"
             )
+
+            BookListScreen()
         }
     }
 }
