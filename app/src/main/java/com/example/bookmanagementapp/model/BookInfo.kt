@@ -26,9 +26,10 @@ data class ImageLinks(
     val thumbnail: String?
 )
 
-@Entity
+@Entity(tableName = "book_info")
 data class BookInfoEntity(
-    @PrimaryKey val isbn: String,
+    @PrimaryKey
+    val isbn: String,
     val title: String?,
     val authors: String?,
     val description: String?,

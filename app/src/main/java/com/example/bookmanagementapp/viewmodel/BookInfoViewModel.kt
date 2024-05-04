@@ -23,7 +23,7 @@ sealed class BookInfoViewState<out T> {
 @HiltViewModel
 class BookInfoViewModel @Inject constructor(
     private val bookApiService: BookApiService,
-    private val bookDao: BookDao
+    private val bookDao: BookDao,
 ) : ViewModel() {
     private var job: Job? = null
 
@@ -54,17 +54,28 @@ class BookInfoViewModel @Inject constructor(
         }
     }
 
+    // エラーメッセージを保持するStateFlowを追加
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     fun saveBookInfoToLocalDatabase(isbn: String, bookInfo: BookInfo) {
-        val bookInfoEntity = BookInfoEntity(
-            isbn = isbn,
-            title = bookInfo.title,
-            authors = bookInfo.authors?.joinToString(", "),
-            description = bookInfo.description,
-            pageCount = bookInfo.pageCount,
-            thumbnail = bookInfo.imageLinks?.thumbnail
-        )
         viewModelScope.launch {
-            bookDao.insertBook(bookInfoEntity)
+            val existingBook = bookDao.findBookByIsbn(isbn)
+            if (existingBook == null) {
+                val bookInfoEntity = BookInfoEntity(
+                    isbn = isbn,
+                    title = bookInfo.title,
+                    authors = bookInfo.authors?.joinToString(", "),
+                    description = bookInfo.description,
+                    pageCount = bookInfo.pageCount,
+                    thumbnail = bookInfo.imageLinks?.thumbnail
+                )
+                bookDao.insertBook(bookInfoEntity)
+            } else {
+                // 書籍が既に存在するため、保存をスキップ
+                // 必要に応じてユーザーに通知
+                _errorMessage.value = "この書籍はすでに登録されています"
+            }
         }
     }
 

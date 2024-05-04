@@ -1,6 +1,7 @@
 package com.example.bookmanagementapp.view.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,9 +51,20 @@ fun BookInfoScreen(
     viewModel: BookInfoViewModel = hiltViewModel(),
 ){
     val bookInfoState = viewModel.bookInfoState.collectAsState()
+    // エラーメッセージを監視
+    val errorMessage = viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(isbn) {
         viewModel.getBookInfo(isbn)
+    }
+
+    val context = LocalContext.current
+    // エラーメッセージが存在する場合、トーストを表示して画面遷移
+    LaunchedEffect(errorMessage.value) {
+        errorMessage.value?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            navController.navigate("isbnScanner")
+        }
     }
 
     Box(

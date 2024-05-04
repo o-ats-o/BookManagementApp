@@ -12,6 +12,9 @@ interface BookDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(book: BookInfoEntity)
 
-    @Query("SELECT * FROM BookInfoEntity")
+    @Query("SELECT * FROM book_info")
     fun getAllBooks(): Flow<List<BookInfoEntity>>
+
+    @Query("SELECT * FROM book_info WHERE isbn = :isbn LIMIT 1")
+    suspend fun findBookByIsbn(isbn: String): BookInfoEntity?
 }
