@@ -1,5 +1,6 @@
 package com.example.bookmanagementapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.dao.BookDao
@@ -58,22 +59,30 @@ class BookInfoViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    fun saveBookInfoToLocalDatabase(isbn: String, bookInfo: BookInfo) {
+    fun saveBookInfoToLocalDatabase(
+        isbn: String,
+        bookInfo: BookInfo,
+        userEnteredTitle: String,
+        userEnteredAuthors: String,
+        userEnteredDescription: String,
+        userEnteredPageCount: String
+    ) {
         viewModelScope.launch {
             val existingBook = bookDao.findBookByIsbn(isbn)
             if (existingBook == null) {
                 val bookInfoEntity = BookInfoEntity(
                     isbn = isbn,
-                    title = bookInfo.title,
-                    authors = bookInfo.authors?.joinToString(", "),
-                    description = bookInfo.description,
-                    pageCount = bookInfo.pageCount,
+                    title = userEnteredTitle,
+                    authors = userEnteredAuthors,
+                    description = userEnteredDescription,
+                    pageCount = userEnteredPageCount.toInt(),
                     thumbnail = bookInfo.imageLinks?.thumbnail
                 )
+                Log.d("DatabaseOperation", "Saving book: $bookInfoEntity")
                 bookDao.insertBook(bookInfoEntity)
             } else {
                 // 書籍が既に存在するため、保存をスキップ
-                // 必要に応じてユーザーに通知
+                // エラーメッセージを設定
                 _errorMessage.value = "この書籍はすでに登録されています"
             }
         }

@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -42,6 +43,8 @@ import com.example.bookmanagementapp.model.BookInfo
 import com.example.bookmanagementapp.model.ImageLinks
 import com.example.bookmanagementapp.viewmodel.BookInfoViewModel
 import com.example.bookmanagementapp.viewmodel.BookInfoViewState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun BookInfoScreen(
@@ -80,9 +83,19 @@ fun BookInfoScreen(
             is BookInfoViewState.Success -> {
                 BookInfoLayout(
                     state.data,
-                    onSaveBookInfo = {
-                        viewModel.saveBookInfoToLocalDatabase(isbn ,state.data)
-                        navController.navigate("isbnScanner")
+                    onSaveBookInfo = { userEnteredTitle, userEnteredAuthors, userEnteredDescription, userEnteredPageCount ->
+                        viewModel.viewModelScope.launch {
+                            viewModel.saveBookInfoToLocalDatabase(
+                                isbn,
+                                state.data,
+                                userEnteredTitle,
+                                userEnteredAuthors,
+                                userEnteredDescription,
+                                userEnteredPageCount
+                            )
+                            delay(1200) // Wait for 1 second
+                            navController.navigate("isbnScanner")
+                        }
                     }
                 )
             }
@@ -98,7 +111,7 @@ fun BookInfoScreen(
 @Composable
 fun BookInfoLayout(
     bookInfo: BookInfo?,
-    onSaveBookInfo: () -> Unit,
+    onSaveBookInfo: (String, String, String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -125,7 +138,9 @@ fun BookInfoLayout(
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { BookField(pageCount, "総ページ数") { newValue -> pageCount.value = newValue } }
         item { Spacer(modifier = Modifier.height(38.dp)) }
-        item { BookInfoSaveButton(isNotEmpty, onSaveBookInfo) }
+        item { BookInfoSaveButton(isNotEmpty, {
+            onSaveBookInfo( title.value, authors.value, description.value, pageCount.value)
+        }) }
     }
 }
 
@@ -265,7 +280,7 @@ val bookInfo = BookInfo(
             thumbnail = ""
         )
     )
-    BookInfoLayout(bookInfo, onSaveBookInfo = {})
+    BookInfoLayout(bookInfo, onSaveBookInfo = { _, _, _, _ -> })
 }
 
 // エラーレイアウトのプレビュー
