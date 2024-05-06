@@ -15,12 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class BookInfoViewState<out T> {
-    data object Loading : BookInfoViewState<Nothing>()
-    data class Success<T>(val data: T) : BookInfoViewState<T>()
-    data class Error(val message: String) : BookInfoViewState<Nothing>()
-}
-
 @HiltViewModel
 class BookInfoViewModel @Inject constructor(
     private val bookApiService: BookApiService,
@@ -100,4 +94,10 @@ class BookInfoViewModel @Inject constructor(
             }
         }
     }
+}
+
+sealed class BookInfoViewState<out T> {
+    data object Loading : BookInfoViewState<Nothing>()
+    data class Success<T>(val data: T) : BookInfoViewState<T>()
+    data class Error(val message: String) : BookInfoViewState<Nothing>()
 }
