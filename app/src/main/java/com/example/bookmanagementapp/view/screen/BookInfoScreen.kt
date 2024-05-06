@@ -1,6 +1,5 @@
 package com.example.bookmanagementapp.view.screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -54,7 +53,6 @@ fun BookInfoScreen(
     viewModel: BookInfoViewModel = hiltViewModel(),
 ){
     val bookInfoState = viewModel.bookInfoState.collectAsState()
-    // エラーメッセージを監視
     val errorMessage = viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(isbn) {
@@ -62,7 +60,6 @@ fun BookInfoScreen(
     }
 
     val context = LocalContext.current
-    // エラーメッセージが存在する場合、トーストを表示して画面遷移
     LaunchedEffect(errorMessage.value) {
         errorMessage.value?.let {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
@@ -77,7 +74,6 @@ fun BookInfoScreen(
     ) {
         when (val state = bookInfoState.value) {
             is BookInfoViewState.Loading -> {
-                // Progress varを表示
                 CircularProgressIndicator()
             }
             is BookInfoViewState.Success -> {
@@ -93,15 +89,14 @@ fun BookInfoScreen(
                                 userEnteredDescription,
                                 userEnteredPageCount
                             )
-                            delay(1200) // Wait for 1 second
+                            delay(1200)
                             navController.navigate("isbnScanner")
                         }
                     }
                 )
             }
             is BookInfoViewState.Error -> {
-                // エラーメッセージをログに表示
-                Log.e("BookInfoScreen", "Error: ${state.message}")
+
             }
         }
     }
