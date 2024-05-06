@@ -46,6 +46,7 @@ fun BookItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp)
     ) {
         Row {
             Image(
