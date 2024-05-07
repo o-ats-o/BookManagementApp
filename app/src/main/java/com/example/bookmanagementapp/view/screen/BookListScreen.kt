@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,20 +22,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookmanagementapp.model.BookInfoEntity
-import com.example.bookmanagementapp.viewmodel.BookInfoViewModel
+import com.example.bookmanagementapp.viewmodel.BookListViewModel
 
 @Composable
 fun BookListScreen(
-    viewModel: BookInfoViewModel = hiltViewModel(),
+    viewModel: BookListViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val allBooks = viewModel.allBooks.collectAsState()
+    val readingProgress = viewModel.readingProgress.collectAsState()
 
     LazyColumn {
-        items(allBooks.value.size) { index ->
-            val book = allBooks.value[index]
+        items(readingProgress.value.size) { index ->
+            val (book, progress) = readingProgress.value[index]
+
             BookItemCard(
                 book = book,
+                progress = progress,
                 modifier = Modifier.padding(8.dp),
                 onBookClick = {
                     navController.navigate("progressInfo/${book.isbn}")
@@ -48,6 +51,7 @@ fun BookListScreen(
 fun BookItemCard(
     modifier: Modifier = Modifier,
     book: BookInfoEntity,
+    progress: Float,
     onBookClick: (BookInfoEntity) -> Unit = {}
 ){
     Card(
@@ -79,6 +83,15 @@ fun BookItemCard(
                     modifier = Modifier.padding(start = 6.dp),
                     fontSize = 14.sp
                 )
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+                // Display a progress bar that represents the reading progress
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }
@@ -96,6 +109,7 @@ fun PreviewBookItemCard(){
             pageCount = 100,
             thumbnail = "https://books.google.com/books/content?id=1l8qAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
             readPageCount = 50
-        )
+        ),
+        progress = 0.5f
     )
 }

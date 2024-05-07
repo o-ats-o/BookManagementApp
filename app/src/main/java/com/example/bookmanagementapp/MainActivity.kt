@@ -20,7 +20,7 @@ import com.example.bookmanagementapp.view.screen.BookInfoScreen
 import com.example.bookmanagementapp.view.screen.BookListScreen
 import com.example.bookmanagementapp.view.screen.ProgressInfoScreen
 import com.example.bookmanagementapp.view.theme.BookManagementAppTheme
-import com.example.bookmanagementapp.viewmodel.BookInfoViewModel
+import com.example.bookmanagementapp.viewmodel.BookListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 fun MainNavHost(
     navController: NavHostController
 ) {
-    val viewModel: BookInfoViewModel = hiltViewModel()
+    val viewModel: BookListViewModel = hiltViewModel()
     val allBooks by viewModel.allBooks.collectAsState()
 
     NavHost(navController = navController, startDestination = "isbnScanner") {

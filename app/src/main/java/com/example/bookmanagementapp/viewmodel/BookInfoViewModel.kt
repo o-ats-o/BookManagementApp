@@ -82,18 +82,6 @@ class BookInfoViewModel @Inject constructor(
             }
         }
     }
-
-    // 書籍情報を取得
-    private val _allBooks = MutableStateFlow<List<BookInfoEntity>>(emptyList())
-    val allBooks: StateFlow<List<BookInfoEntity>> = _allBooks
-
-    init {
-        viewModelScope.launch {
-            bookDao.getAllBooks().collect {
-                _allBooks.value = it
-            }
-        }
-    }
 }
 
 sealed class BookInfoViewState<out T> {
