@@ -11,10 +11,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,8 +81,9 @@ fun BookItemCard(
             Column {
                 Text(
                     text = book.title.toString(),
-                    modifier = Modifier.padding(start = 6.dp, top = 6.dp, end = 6.dp),
+                    modifier = Modifier.padding(start = 6.dp, top = 9.dp, end = 6.dp),
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -90,12 +96,20 @@ fun BookItemCard(
                 )
                 Text(
                     text = "${(progress * 100).toInt()}%",
-                    modifier = Modifier.padding(start = 6.dp)
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .padding(end = 18.dp)
+                        .align(Alignment.End)
                 )
                 // 進捗状況を示すLinearProgressIndicatorを追加
                 LinearProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(start = 6.dp, end = 18.dp, top = 8.dp)
+                        .fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = Color.Gray,
+                    strokeCap = StrokeCap.Round
                 )
             }
         }
