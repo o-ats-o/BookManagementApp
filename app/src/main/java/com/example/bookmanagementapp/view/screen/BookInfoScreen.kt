@@ -39,6 +39,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.bookmanagementapp.model.BookInfo
+import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.model.ImageLinks
 import com.example.bookmanagementapp.viewmodel.BookInfoViewModel
 import com.example.bookmanagementapp.viewmodel.BookInfoViewState
@@ -77,13 +78,14 @@ fun BookInfoScreen(
                 CircularProgressIndicator()
             }
             is BookInfoViewState.Success -> {
+                val bookInfo = mapBookInfoEntityToBookInfo(state.data)
                 BookInfoLayout(
-                    state.data,
+                    bookInfo = bookInfo,
                     onSaveBookInfo = { userEnteredTitle, userEnteredAuthors, userEnteredDescription, userEnteredPageCount ->
                         viewModel.viewModelScope.launch {
                             viewModel.saveBookInfoToLocalDatabase(
                                 isbn,
-                                state.data,
+                                bookInfo,
                                 userEnteredTitle,
                                 userEnteredAuthors,
                                 userEnteredDescription,
@@ -260,6 +262,16 @@ fun ErrorLayout(
             fontSize = 16.sp
         )
     }
+}
+
+fun mapBookInfoEntityToBookInfo(bookInfoEntity: BookInfoEntity): BookInfo {
+    return BookInfo(
+        title = bookInfoEntity.title,
+        authors = bookInfoEntity.authors?.split(", "),
+        description = bookInfoEntity.description,
+        pageCount = bookInfoEntity.pageCount,
+        imageLinks = ImageLinks(thumbnail = bookInfoEntity.thumbnail)
+    )
 }
 
 // 書籍情報レイアウトのプレビュー

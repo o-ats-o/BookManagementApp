@@ -1,12 +1,11 @@
 package com.example.bookmanagementapp.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bookmanagementapp.dao.BookDao
 import com.example.bookmanagementapp.model.BookInfo
 import com.example.bookmanagementapp.model.BookInfoEntity
-import com.example.bookmanagementapp.network.BookApiService
+import com.example.bookmanagementapp.repository.BookRepository
+import com.example.bookmanagementapp.usecase.GetBookInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,13 +16,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookInfoViewModel @Inject constructor(
-    private val bookApiService: BookApiService,
-    private val bookDao: BookDao,
+    private val bookRepository: BookRepository,
+    private val getBookInfoUseCase: GetBookInfoUseCase,
 ) : ViewModel() {
     private var job: Job? = null
 
-    private val _bookInfoState = MutableStateFlow<BookInfoViewState<BookInfo>>(BookInfoViewState.Loading)
-    val bookInfoState: StateFlow<BookInfoViewState<BookInfo>> = _bookInfoState
+    private val _bookInfoState = MutableStateFlow<BookInfoViewState>(BookInfoViewState.Loading)
+    val bookInfoState: StateFlow<BookInfoViewState> = _bookInfoState
 
     fun getBookInfo(isbn: String) {
         job?.cancel()
@@ -31,17 +30,11 @@ class BookInfoViewModel @Inject constructor(
         job = viewModelScope.launch(Dispatchers.IO) {
             _bookInfoState.value = BookInfoViewState.Loading
             try {
-                val response = bookApiService.getBookInfo("isbn:$isbn")
-                if (response.isSuccessful) {
-                    val bookResponse = response.body()
-                    val bookInfo = bookResponse?.items?.firstOrNull()?.volumeInfo
-                    if (bookInfo != null) {
-                        _bookInfoState.value = BookInfoViewState.Success(bookInfo)
-                    } else {
-                        throw Exception("Book info not found")
-                    }
+                val bookInfoEntity = getBookInfoUseCase.execute(isbn)
+                if (bookInfoEntity != null) {
+                    _bookInfoState.value = BookInfoViewState.Success(bookInfoEntity)
                 } else {
-                    throw Exception("Error: ${response.message()}")
+                    throw Exception("Book info not found")
                 }
             } catch (exception: Exception) {
                 _bookInfoState.value = BookInfoViewState.Error(exception.message ?: "Unknown error")
@@ -62,7 +55,7 @@ class BookInfoViewModel @Inject constructor(
         userEnteredPageCount: String
     ) {
         viewModelScope.launch {
-            val existingBook = bookDao.findBookByIsbn(isbn)
+            val existingBook = bookRepository.getBookInfo(isbn)
             if (existingBook == null) {
                 val bookInfoEntity = BookInfoEntity(
                     isbn = isbn,
@@ -73,8 +66,7 @@ class BookInfoViewModel @Inject constructor(
                     thumbnail = bookInfo.imageLinks?.thumbnail,
                     readPageCount = 0
                 )
-                Log.d("DatabaseOperation", "Saving book: $bookInfoEntity")
-                bookDao.insertBook(bookInfoEntity)
+                bookRepository.saveBookInfo(bookInfoEntity)
             } else {
                 // 書籍が既に存在するため、保存をスキップ
                 // エラーメッセージを設定
@@ -84,8 +76,8 @@ class BookInfoViewModel @Inject constructor(
     }
 }
 
-sealed class BookInfoViewState<out T> {
-    data object Loading : BookInfoViewState<Nothing>()
-    data class Success<T>(val data: T) : BookInfoViewState<T>()
-    data class Error(val message: String) : BookInfoViewState<Nothing>()
+sealed class BookInfoViewState {
+    data object Loading : BookInfoViewState()
+    data class Success(val data: BookInfoEntity) : BookInfoViewState()
+    data class Error(val message: String) : BookInfoViewState()
 }

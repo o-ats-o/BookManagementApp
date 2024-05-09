@@ -3,7 +3,7 @@ package com.example.bookmanagementapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.model.BookInfoEntity
-import com.example.bookmanagementapp.dao.BookDao
+import com.example.bookmanagementapp.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,17 +13,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookListViewModel @Inject constructor(
-    bookDao: BookDao
+    bookRepository: BookRepository
 ) : ViewModel() {
 
-    // 書籍情報を取得
-    private val allBooksFlow: Flow<List<BookInfoEntity>> = bookDao.getAllBooks()
+    private val allBooksFlow: Flow<List<BookInfoEntity>> = bookRepository.getAllBooks()
 
-    // 書籍情報のStateFlow
     private val _allBooks = MutableStateFlow<List<BookInfoEntity>>(emptyList())
     val allBooks: StateFlow<List<BookInfoEntity>> = _allBooks
 
-    // 読書進行状況のStateFlow
     private val _readingProgress = MutableStateFlow<List<Pair<BookInfoEntity, Float>>>(emptyList())
     val readingProgress: StateFlow<List<Pair<BookInfoEntity, Float>>> = _readingProgress
 
