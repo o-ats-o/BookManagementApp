@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,33 +42,41 @@ fun ProgressInfoScreen(
     book: BookInfoEntity,
     navController: NavController,
     viewModel: ProgressInfoViewModel = hiltViewModel()
-    ) {
-    val readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
-    val pageCount by remember { mutableStateOf(book.pageCount.toString()) }
-    val isNotEmpty by remember { mutableStateOf(false) }
+) {
+    var readPageCount by remember { mutableStateOf(book.readPageCount) }
+    val pageCount by remember { mutableStateOf(book.pageCount) }
+    var isNotEmpty by remember { mutableStateOf(false) }
+
+    LaunchedEffect(readPageCount, pageCount) {
+        isNotEmpty =
+            (readPageCount)!! <= ((pageCount!!))
+    }
 
     ProgressLayout(
         book = book,
-        onSaveBookInfo = {
+        onSaveBookInfo = { newReadPageCount: Int ->
             viewModel.viewModelScope.launch {
                 viewModel.updateBookProgress(
                     book.isbn,
-                    readPageCount.toIntOrNull() ?: 0,
-                    pageCount.toIntOrNull() ?: 0
+                    newReadPageCount,
+                    pageCount!!.toInt()
                 )
                 delay(1200)
                 navController.navigate("bookList")
             }
         },
+        onReadPageCountChange = { newReadPageCount: Int ->
+            readPageCount = newReadPageCount
+        },
         isNotEmpty = isNotEmpty
     )
-
 }
 
 @Composable
 fun ProgressLayout(
     book: BookInfoEntity,
-    onSaveBookInfo: () -> Unit,
+    onSaveBookInfo: (Int) -> Unit,
+    onReadPageCountChange: (Int) -> Unit,
     isNotEmpty: Boolean
 ) {
     var readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
@@ -106,7 +115,10 @@ fun ProgressLayout(
         Spacer(modifier = Modifier.padding(top = 18.dp))
         TextField(
             value = readPageCount,
-            onValueChange = { readPageCount = it },
+            onValueChange = {
+                readPageCount = it
+                onReadPageCountChange(it.toInt())
+            },
             label = { Text("現在のページ数") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -121,7 +133,7 @@ fun ProgressLayout(
         )
         Spacer(modifier = Modifier.padding(top = 60.dp))
         ProgressInfoSaveButton(
-            onSaveBookInfo = { onSaveBookInfo()},
+            onSaveBookInfo = { onSaveBookInfo(readPageCount.toInt())},
             isNotEmpty = isNotEmpty,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
@@ -159,6 +171,7 @@ fun PreviewProgressInfoLayout() {
             readPageCount = 100
         ),
         onSaveBookInfo = {},
-        isNotEmpty = true
+        isNotEmpty = true,
+        onReadPageCountChange = {}
     )
 }
