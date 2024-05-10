@@ -1,9 +1,9 @@
-package com.example.bookmanagementapp.database
+package com.example.bookmanagementapp.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.bookmanagementapp.dao.BookDao
 import com.example.bookmanagementapp.model.BookInfoEntity
+import com.example.bookmanagementapp.room.BookDao
 
 @Database(entities = [BookInfoEntity::class], version = 2)
 abstract class BookDatabase : RoomDatabase() {

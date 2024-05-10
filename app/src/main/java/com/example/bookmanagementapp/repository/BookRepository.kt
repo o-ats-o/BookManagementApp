@@ -1,6 +1,6 @@
 package com.example.bookmanagementapp.repository
 
-import com.example.bookmanagementapp.dao.BookDao
+import com.example.bookmanagementapp.room.BookDao
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.model.BookResponse
 import com.example.bookmanagementapp.network.BookApiService

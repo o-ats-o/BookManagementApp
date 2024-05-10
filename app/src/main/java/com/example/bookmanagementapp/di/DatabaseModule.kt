@@ -2,8 +2,8 @@ package com.example.bookmanagementapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.bookmanagementapp.dao.BookDao
-import com.example.bookmanagementapp.database.BookDatabase
+import com.example.bookmanagementapp.room.BookDao
+import com.example.bookmanagementapp.room.BookDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
