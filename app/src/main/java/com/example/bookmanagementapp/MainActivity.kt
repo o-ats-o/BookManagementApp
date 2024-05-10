@@ -68,7 +68,7 @@ fun MainNavHost(
             Log.d("MainActivity", "isbn: $isbn")
             val book = allBooks.find { it.isbn == isbn }
             if (book != null) {
-                ProgressInfoScreen(book)
+                ProgressInfoScreen(book, navController, viewModel = hiltViewModel())
             }
         }
     }

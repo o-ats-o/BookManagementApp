@@ -1,8 +1,14 @@
 package com.example.bookmanagementapp.view.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -10,46 +16,149 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.RoundedCornersTransformation
 import com.example.bookmanagementapp.model.BookInfoEntity
+import com.example.bookmanagementapp.viewmodel.ProgressInfoViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
-fun ProgressInfoScreen(book: BookInfoEntity) {
+fun ProgressInfoScreen(
+    book: BookInfoEntity,
+    navController: NavController,
+    viewModel: ProgressInfoViewModel = hiltViewModel()
+    ) {
+    val readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
+    val pageCount by remember { mutableStateOf(book.pageCount.toString()) }
+    val isNotEmpty by remember { mutableStateOf(false) }
+
+    ProgressLayout(
+        book = book,
+        onSaveBookInfo = {
+            viewModel.viewModelScope.launch {
+                viewModel.updateBookProgress(
+                    book.isbn,
+                    readPageCount.toIntOrNull() ?: 0,
+                    pageCount.toIntOrNull() ?: 0
+                )
+                delay(1200)
+                navController.navigate("bookList")
+            }
+        },
+        isNotEmpty = isNotEmpty
+    )
+
+}
+
+@Composable
+fun ProgressLayout(
+    book: BookInfoEntity,
+    onSaveBookInfo: () -> Unit,
+    isNotEmpty: Boolean
+) {
     var readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
     var pageCount by remember { mutableStateOf(book.pageCount.toString()) }
 
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
     ) {
-        Text(text = "Title: ${book.title}")
+        Image(
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(book.thumbnail)
+                    .transformations(RoundedCornersTransformation(4f))
+                    .build()
+            ),
+            contentDescription = "Book thumbnail",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(240.dp)
+                .width(160.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+        Spacer(modifier = Modifier.padding(top = 28.dp))
+        Text(
+            text = book.title.toString(),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.padding(top = 2.dp))
+        Text(
+            text = book.authors.toString(),
+            fontSize = 16.sp,
+        )
+        Spacer(modifier = Modifier.padding(top = 18.dp))
         TextField(
             value = readPageCount,
             onValueChange = { readPageCount = it },
-            label = { Text("Read Pages") }
+            label = { Text("現在のページ数") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(top = 28.dp))
         TextField(
             value = pageCount,
             onValueChange = { pageCount = it },
-            label = { Text("Total Pages") }
+            label = { Text("総ページ数") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.padding(top = 60.dp))
+        ProgressInfoSaveButton(
+            onSaveBookInfo = { onSaveBookInfo()},
+            isNotEmpty = isNotEmpty,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@Composable
+fun ProgressInfoSaveButton(
+    modifier: Modifier = Modifier,
+    onSaveBookInfo: () -> Unit,
+    isNotEmpty: Boolean
+) {
+    Button(
+        onClick = { onSaveBookInfo() },
+        modifier = modifier
+            .width(120.dp)
+            .height(40.dp),
+        enabled = isNotEmpty
+    ) {
+        Text("保存")
     }
 }
 
 @Preview
 @Composable
-fun PreviewProgressInfoScreen() {
-    ProgressInfoScreen(
+fun PreviewProgressInfoLayout() {
+    ProgressLayout(
         book = BookInfoEntity(
-            isbn = "978-4-04-713928-8",
+            isbn = "978-4-7741-9231-1",
             title = "Kotlinスタートブック",
             authors = "渡辺 竜王",
-            description = "Kotlinの基本から応用までを網羅した入門書",
+            description = "Kotlinの基本から応用までを網羅した解説書",
             pageCount = 360,
-            thumbnail = "https://watanabejunma.github.io/kotlin-book-cover.jpg",
+            thumbnail = "https://example.com/kotlin_start_book.jpg",
             readPageCount = 100
-        )
+        ),
+        onSaveBookInfo = {},
+        isNotEmpty = true
     )
 }

@@ -73,11 +73,10 @@ fun BookItemCard(
                 painter = rememberAsyncImagePainter(model = book.thumbnail),
                 contentDescription = "Book thumbnail",
                 modifier = Modifier
-                    .height(120.dp)
-                    .width(80.dp)
+                    .height(130.dp)
+                    .width(90.dp)
                     .padding(start = 10.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
             )
-
             Column {
                 Text(
                     text = book.title.toString(),
@@ -96,16 +95,18 @@ fun BookItemCard(
                 )
                 Text(
                     text = "${(progress * 100).toInt()}%",
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .padding(end = 18.dp)
+                        .padding(end = 26.dp)
                         .align(Alignment.End)
                 )
                 // 進捗状況を示すLinearProgressIndicatorを追加
                 LinearProgressIndicator(
                     progress = { progress },
                     modifier = Modifier
-                        .padding(start = 6.dp, end = 18.dp, top = 8.dp)
+                        .padding(start = 12.dp, end = 28.dp, top = 12.dp)
+                        .height(7.dp)
                         .fillMaxWidth(),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = Color.Gray,
