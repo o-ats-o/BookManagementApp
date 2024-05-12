@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,6 @@ import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.viewmodel.ProgressInfoViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -43,30 +43,25 @@ fun ProgressInfoScreen(
     navController: NavController,
     viewModel: ProgressInfoViewModel = hiltViewModel()
 ) {
-    var readPageCount by remember { mutableStateOf(book.readPageCount) }
-    val pageCount by remember { mutableStateOf(book.pageCount) }
-    var isNotEmpty by remember { mutableStateOf(false) }
+    val isNotEmpty by viewModel.isNotEmpty.collectAsState()
 
-    LaunchedEffect(readPageCount, pageCount) {
-        isNotEmpty =
-            (readPageCount)!! <= ((pageCount!!))
+    LaunchedEffect(book) {
+        viewModel.updateBookInfo(book)
     }
 
     ProgressLayout(
         book = book,
-        onSaveBookInfo = { newReadPageCount: Int ->
+        onSaveBookInfo = { _, _ ->
             viewModel.viewModelScope.launch {
-                viewModel.updateBookProgress(
-                    book.isbn,
-                    newReadPageCount,
-                    pageCount!!.toInt()
-                )
-                delay(1200)
+                viewModel.updateBookProgress(book.isbn)
                 navController.navigate("bookList")
             }
         },
-        onReadPageCountChange = { newReadPageCount: Int ->
-            readPageCount = newReadPageCount
+        onReadPageCountChange = { newReadPageCount ->
+            viewModel.updateReadPageCount(newReadPageCount)
+        },
+        onPageCountChange = { newPageCount ->
+            viewModel.updatePageCount(newPageCount)
         },
         isNotEmpty = isNotEmpty
     )
@@ -75,9 +70,10 @@ fun ProgressInfoScreen(
 @Composable
 fun ProgressLayout(
     book: BookInfoEntity,
-    onSaveBookInfo: (Int) -> Unit,
+    onSaveBookInfo: (Int,Int) -> Unit,
     onReadPageCountChange: (Int) -> Unit,
-    isNotEmpty: Boolean
+    onPageCountChange: (Int) -> Unit,
+    isNotEmpty: Boolean,
 ) {
     var readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
     var pageCount by remember { mutableStateOf(book.pageCount.toString()) }
@@ -117,7 +113,13 @@ fun ProgressLayout(
             value = readPageCount,
             onValueChange = {
                 readPageCount = it
-                onReadPageCountChange(it.toInt())
+                if (it.isNotEmpty()) {
+                    try {
+                        onReadPageCountChange(it.toInt())
+                    } catch (e: NumberFormatException) {
+                        // 入力文字列が整数に変換できない場合は無視
+                    }
+                }
             },
             label = { Text("現在のページ数") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -126,14 +128,23 @@ fun ProgressLayout(
         Spacer(modifier = Modifier.padding(top = 28.dp))
         TextField(
             value = pageCount,
-            onValueChange = { pageCount = it },
+            onValueChange = {
+                pageCount = it
+                if (it.isNotEmpty()) {
+                    try {
+                        onPageCountChange(it.toInt())
+                    } catch (e: NumberFormatException) {
+                        // 入力文字列が整数に変換できない場合は無視
+                    }
+                }
+            },
             label = { Text("総ページ数") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(top = 60.dp))
         ProgressInfoSaveButton(
-            onSaveBookInfo = { onSaveBookInfo(readPageCount.toInt())},
+            onSaveBookInfo = { onSaveBookInfo(readPageCount.toInt(),pageCount.toInt())},
             isNotEmpty = isNotEmpty,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
@@ -147,7 +158,7 @@ fun ProgressInfoSaveButton(
     isNotEmpty: Boolean
 ) {
     Button(
-        onClick = { onSaveBookInfo() },
+        onClick = onSaveBookInfo,
         modifier = modifier
             .width(120.dp)
             .height(40.dp),
@@ -170,8 +181,9 @@ fun PreviewProgressInfoLayout() {
             thumbnail = "https://example.com/kotlin_start_book.jpg",
             readPageCount = 100
         ),
-        onSaveBookInfo = {},
+        onSaveBookInfo = { _,_ -> },
         isNotEmpty = true,
-        onReadPageCountChange = {}
+        onReadPageCountChange = {},
+        onPageCountChange = {}
     )
 }
