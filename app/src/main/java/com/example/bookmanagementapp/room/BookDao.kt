@@ -1,4 +1,4 @@
-package com.example.bookmanagementapp.dao
+package com.example.bookmanagementapp.room
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -64,7 +64,9 @@ fun IsbnScanner(navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BookListScreen()
+            BookListScreen(
+                navController = navController
+            )
         }
     }
 }
