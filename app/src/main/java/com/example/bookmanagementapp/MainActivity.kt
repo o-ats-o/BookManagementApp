@@ -65,7 +65,6 @@ fun MainNavHost(
         }
         composable("progressInfo/{isbn}") { backStackEntry ->
             val isbn = backStackEntry.arguments?.getString("isbn") ?: ""
-            Log.d("MainActivity", "isbn: $isbn")
             val book = allBooks.find { it.isbn == isbn }
             if (book != null) {
                 ProgressInfoScreen(book, navController, viewModel = hiltViewModel())
