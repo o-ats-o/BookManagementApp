@@ -36,36 +36,15 @@ fun IsbnScanner(navController: NavController) {
             }
         }
     }
-
-    Scaffold (
-        floatingActionButton = {
-            // スキャンオプションの設定
-            val scanOptions = ScanOptions().apply {
-                setCaptureActivity(CustomScannerActivity::class.java)
-                setOrientationLocked(false)
-                setPrompt("")
-            }
-            // フローティングアクションボタン
-            FloatingActionButton(
-                onClick = {
-                    barcodeLauncher.launch(scanOptions)
-                },
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
-            ) {
-                Icon(
-                    Icons.Default.Add, contentDescription = "Add"
-                )
-            }
-        }
-    ){innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             BookListScreen(
-                navController = navController
+                navController = navController,
+                barcodeLauncher = barcodeLauncher
             )
         }
     }

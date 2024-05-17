@@ -1,8 +1,11 @@
 package com.example.bookmanagementapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +23,8 @@ import com.example.bookmanagementapp.view.screen.BookListScreen
 import com.example.bookmanagementapp.view.screen.ProgressInfoScreen
 import com.example.bookmanagementapp.view.theme.BookManagementAppTheme
 import com.example.bookmanagementapp.viewmodel.BookListViewModel
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,7 +39,20 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    MainNavHost(navController = navController)
+                    val barcodeLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
+                        if (result.contents == null) {
+                            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG)
+                                .show()
+                        } else {
+                            if (result.contents.startsWith("97")) {
+                                navController.navigate("bookInformation/${result.contents}")
+                            } else {
+                                Toast.makeText(this, "Invalid ISBN", Toast.LENGTH_LONG)
+                                    .show()
+                            }
+                        }
+                    }
+                    MainNavHost(navController = navController, barcodeLauncher = barcodeLauncher)
                 }
             }
         }
@@ -43,7 +61,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainNavHost(
-    navController: NavHostController
+    navController: NavHostController,
+    barcodeLauncher: ActivityResultLauncher<ScanOptions>
 ) {
     val viewModel: BookListViewModel = hiltViewModel()
     val allBooks by viewModel.allBooks.collectAsState()
@@ -58,8 +77,9 @@ fun MainNavHost(
         }
         composable("bookList") {
             BookListScreen(
-                viewModel = viewModel,
-                navController = navController
+                navController = navController,
+                barcodeLauncher = barcodeLauncher,
+                viewModel = hiltViewModel()
             )
         }
         composable("progressInfo/{isbn}") { backStackEntry ->
