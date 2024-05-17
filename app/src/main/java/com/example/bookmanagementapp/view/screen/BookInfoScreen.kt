@@ -64,6 +64,7 @@ fun BookInfoScreen(
     LaunchedEffect(errorMessage.value) {
         errorMessage.value?.let {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.clearErrorMessage()
             navController.navigate("isbnScanner")
         }
     }

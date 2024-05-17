@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.repository.BookRepository
-import com.example.bookmanagementapp.usecase.GetBookInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgressInfoViewModel @Inject constructor(
-    private val getBookInfoUseCase: GetBookInfoUseCase,
     private val bookRepository: BookRepository
 ) : ViewModel() {
 
@@ -57,9 +55,13 @@ class ProgressInfoViewModel @Inject constructor(
         val readPageCount = _readPageCount.value
         val pageCount = _pageCount.value
         if (readPageCount != null && pageCount != null) {
-            val bookInfo = getBookInfoUseCase.execute(isbn)
+            val bookInfo = bookRepository.getBookInfo(isbn)
             if (bookInfo != null) {
-                val updatedBookInfo = bookInfo.copy(readPageCount = readPageCount, pageCount = pageCount)
+                val updatedBookInfo = bookInfo.copy(
+                    authors = bookInfo.authors,
+                    readPageCount = readPageCount,
+                    pageCount = pageCount
+                )
                 bookRepository.saveBookInfo(updatedBookInfo)
             }
         }
