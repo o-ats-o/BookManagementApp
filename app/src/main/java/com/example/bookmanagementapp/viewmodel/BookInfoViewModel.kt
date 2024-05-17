@@ -74,6 +74,10 @@ class BookInfoViewModel @Inject constructor(
             }
         }
     }
+
+    fun clearErrorMessage() {
+        _errorMessage.value = null
+    }
 }
 
 sealed class BookInfoViewState {
