@@ -17,22 +17,20 @@ class ProgressInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
     // readPageCountとpageCountの値を保持するStateFlowを追加
-    private val _readPageCount: MutableStateFlow<Int?>
-    private val _pageCount: MutableStateFlow<Int?>
+    private val _readPageCount: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _pageCount: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    // 進捗情報が空でないかどうかを保持するStateFlowを追加
-    private val _isNotEmpty = MutableStateFlow(false)
-    val isNotEmpty: StateFlow<Boolean> = _isNotEmpty
+    // 現在のページ数が総ページを超えていないかを判定するStateFlowを追加
+    private val _isNotOverPageCount = MutableStateFlow(false)
+    val isNotOverPageCount: StateFlow<Boolean> = _isNotOverPageCount
 
     init {
-        _readPageCount = MutableStateFlow(null)
-        _pageCount = MutableStateFlow(null)
 
         viewModelScope.launch {
             combine(_readPageCount, _pageCount) { readPageCount, pageCount ->
-                readPageCount != null && pageCount != null && (readPageCount <= pageCount)
+               readPageCount <= pageCount
             }.collect {
-                _isNotEmpty.value = it
+                _isNotOverPageCount.value = it
             }
         }
     }
@@ -48,22 +46,20 @@ class ProgressInfoViewModel @Inject constructor(
 
     fun updateBookInfo(book: BookInfoEntity) {
         _readPageCount.value = book.readPageCount
-        _pageCount.value = book.pageCount
+        _pageCount.value = book.pageCount!!
     }
 
     suspend fun updateBookProgress(isbn: String) {
         val readPageCount = _readPageCount.value
         val pageCount = _pageCount.value
-        if (readPageCount != null && pageCount != null) {
-            val bookInfo = bookRepository.getBookInfo(isbn)
-            if (bookInfo != null) {
-                val updatedBookInfo = bookInfo.copy(
-                    authors = bookInfo.authors,
-                    readPageCount = readPageCount,
-                    pageCount = pageCount
-                )
-                bookRepository.saveBookInfo(updatedBookInfo)
-            }
+        val bookInfo = bookRepository.getBookInfo(isbn)
+        if (bookInfo != null) {
+            val updatedBookInfo = bookInfo.copy(
+                authors = bookInfo.authors,
+                readPageCount = readPageCount,
+                pageCount = pageCount
+            )
+            bookRepository.saveBookInfo(updatedBookInfo)
         }
     }
 }
