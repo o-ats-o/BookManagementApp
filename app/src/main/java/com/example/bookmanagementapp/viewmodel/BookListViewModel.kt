@@ -29,7 +29,7 @@ class BookListViewModel @Inject constructor(
             allBooksFlow.collect { books ->
                 _allBooks.value = books
                 _readingProgress.value = books.map { book ->
-                    val progress = if (book.pageCount != null && book.readPageCount != null && book.pageCount != 0) {
+                    val progress = if (book.pageCount != null && book.pageCount != 0) {
                         calculateReadingProgress(book.readPageCount, book.pageCount)
                     } else {
                         0f
@@ -40,8 +40,8 @@ class BookListViewModel @Inject constructor(
         }
     }
 
-    private fun calculateReadingProgress(readPageCount: Int?, pageCount: Int?): Float {
-        return if (pageCount!= null && readPageCount!= null && pageCount!= 0) {
+    private fun calculateReadingProgress(readPageCount: Int, pageCount: Int): Float {
+        return if (pageCount!= 0) {
             readPageCount.toFloat() / pageCount.toFloat()
         } else {
             0f

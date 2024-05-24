@@ -35,5 +35,5 @@ data class BookInfoEntity(
     val description: String?,
     val pageCount: Int?,
     val thumbnail: String?,
-    val readPageCount: Int?
+    val readPageCount: Int
 )

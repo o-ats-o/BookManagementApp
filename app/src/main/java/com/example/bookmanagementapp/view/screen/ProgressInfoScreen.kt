@@ -43,7 +43,7 @@ fun ProgressInfoScreen(
     navController: NavController,
     viewModel: ProgressInfoViewModel = hiltViewModel()
 ) {
-    val isNotEmpty by viewModel.isNotEmpty.collectAsState()
+    val isNotOverPageCount = viewModel.isNotOverPageCount.collectAsState().value
 
     LaunchedEffect(book) {
         viewModel.updateBookInfo(book)
@@ -63,7 +63,7 @@ fun ProgressInfoScreen(
         onPageCountChange = { newPageCount ->
             viewModel.updatePageCount(newPageCount)
         },
-        isNotEmpty = isNotEmpty
+        isNotOverPageCount = isNotOverPageCount
     )
 }
 
@@ -73,7 +73,7 @@ fun ProgressLayout(
     onSaveBookInfo: (Int,Int) -> Unit,
     onReadPageCountChange: (Int) -> Unit,
     onPageCountChange: (Int) -> Unit,
-    isNotEmpty: Boolean,
+    isNotOverPageCount: Boolean,
 ) {
     var readPageCount by remember { mutableStateOf(book.readPageCount.toString()) }
     var pageCount by remember { mutableStateOf(book.pageCount.toString()) }
@@ -143,9 +143,12 @@ fun ProgressLayout(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.padding(top = 60.dp))
+
+
+        val isInputNotEmpty = readPageCount.isNotEmpty() && pageCount.isNotEmpty()
         ProgressInfoSaveButton(
             onSaveBookInfo = { onSaveBookInfo(readPageCount.toInt(),pageCount.toInt())},
-            isNotEmpty = isNotEmpty,
+            isNotEmpty = isNotOverPageCount && isInputNotEmpty,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
@@ -182,8 +185,8 @@ fun PreviewProgressInfoLayout() {
             readPageCount = 100
         ),
         onSaveBookInfo = { _,_ -> },
-        isNotEmpty = true,
         onReadPageCountChange = {},
-        onPageCountChange = {}
+        onPageCountChange = {},
+        isNotOverPageCount = true
     )
 }
