@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,16 +27,21 @@ class BookListViewModel @Inject constructor(
     val readingProgress: StateFlow<List<Pair<BookInfoEntity, Float>>> = _readingProgress
 
     init {
-        viewModelScope.launch {
+        // DBから書籍情報の取得を行うのでIOスレッドで実行
+        viewModelScope.launch(Dispatchers.IO) {
             allBooksFlow.collect { books ->
-                _allBooks.value = books
-                _readingProgress.value = books.map { book ->
-                    val progress = if (book.pageCount != null && book.pageCount != 0) {
+                val progressList = books.map { book ->
+                    val progress = if (book.pageCount != 0) {
                         calculateReadingProgress(book.readPageCount, book.pageCount)
                     } else {
                         0f
                     }
                     Pair(book, progress)
+                }
+                // stateFlowの値を更新するのでMainスレッドで実行
+                withContext(Dispatchers.Main) {
+                    _allBooks.value = books
+                    _readingProgress.value = progressList
                 }
             }
         }

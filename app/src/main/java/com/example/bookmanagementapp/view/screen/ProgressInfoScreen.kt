@@ -99,13 +99,13 @@ fun ProgressLayout(
         )
         Spacer(modifier = Modifier.padding(top = 28.dp))
         Text(
-            text = book.title.toString(),
+            text = book.title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.padding(top = 2.dp))
         Text(
-            text = book.authors.toString(),
+            text = book.authors,
             fontSize = 16.sp,
         )
         Spacer(modifier = Modifier.padding(top = 18.dp))

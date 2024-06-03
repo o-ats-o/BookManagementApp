@@ -46,7 +46,7 @@ class ProgressInfoViewModel @Inject constructor(
 
     fun updateBookInfo(book: BookInfoEntity) {
         _readPageCount.value = book.readPageCount
-        _pageCount.value = book.pageCount!!
+        _pageCount.value = book.pageCount
     }
 
     suspend fun updateBookProgress(isbn: String) {

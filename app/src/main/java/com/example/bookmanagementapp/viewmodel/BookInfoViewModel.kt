@@ -25,6 +25,7 @@ class BookInfoViewModel @Inject constructor(
     val bookInfoState: StateFlow<BookInfoViewState> = _bookInfoState
 
     fun getBookInfo(isbn: String) {
+        // 最新の書籍情報を取得するために前回のジョブをキャンセル
         job?.cancel()
         // APIから書籍情報を取得するのでIOスレッドで実行
         job = viewModelScope.launch(Dispatchers.IO) {
@@ -54,7 +55,8 @@ class BookInfoViewModel @Inject constructor(
         userEnteredDescription: String,
         userEnteredPageCount: String
     ) {
-        viewModelScope.launch {
+        // 保存処理を実行するのでIOスレッドで実行
+        viewModelScope.launch(Dispatchers.IO) { // IOスレッドで実行
             val existingBook = bookRepository.getBookInfo(isbn)
             if (existingBook == null) {
                 val bookInfoEntity = BookInfoEntity(
@@ -63,7 +65,7 @@ class BookInfoViewModel @Inject constructor(
                     authors = userEnteredAuthors,
                     description = userEnteredDescription,
                     pageCount = userEnteredPageCount.toInt(),
-                    thumbnail = bookInfo.imageLinks?.thumbnail,
+                    thumbnail = bookInfo.imageLinks?.thumbnail ?: "",
                     readPageCount = 0
                 )
                 bookRepository.saveBookInfo(bookInfoEntity)

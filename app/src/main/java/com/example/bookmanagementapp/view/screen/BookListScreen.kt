@@ -109,7 +109,7 @@ fun BookItemCard(
             )
             Column {
                 Text(
-                    text = book.title.toString(),
+                    text = book.title,
                     modifier = Modifier.padding(start = 6.dp, top = 9.dp, end = 6.dp),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -117,7 +117,7 @@ fun BookItemCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text( // 著者情報を表示するTextコンポーネントを追加
-                    text = book.authors.toString(),
+                    text = book.authors,
                     modifier = Modifier.padding(start = 6.dp, end = 6.dp),
                     fontSize = 14.sp,
                     maxLines = 1,
