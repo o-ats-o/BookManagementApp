@@ -268,7 +268,7 @@ fun ErrorLayout(
 fun mapBookInfoEntityToBookInfo(bookInfoEntity: BookInfoEntity): BookInfo {
     return BookInfo(
         title = bookInfoEntity.title,
-        authors = bookInfoEntity.authors?.split(", "),
+        authors = bookInfoEntity.authors.split(", "),
         description = bookInfoEntity.description,
         pageCount = bookInfoEntity.pageCount,
         imageLinks = ImageLinks(thumbnail = bookInfoEntity.thumbnail)

@@ -65,7 +65,7 @@ class BookInfoViewModel @Inject constructor(
                     authors = userEnteredAuthors,
                     description = userEnteredDescription,
                     pageCount = userEnteredPageCount.toInt(),
-                    thumbnail = bookInfo.imageLinks?.thumbnail,
+                    thumbnail = bookInfo.imageLinks?.thumbnail ?: "",
                     readPageCount = 0
                 )
                 bookRepository.saveBookInfo(bookInfoEntity)

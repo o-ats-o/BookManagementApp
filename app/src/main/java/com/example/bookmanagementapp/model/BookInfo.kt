@@ -30,10 +30,10 @@ data class ImageLinks(
 data class BookInfoEntity(
     @PrimaryKey
     val isbn: String,
-    val title: String?,
-    val authors: String?,
-    val description: String?,
-    val pageCount: Int?,
-    val thumbnail: String?,
+    val title: String,
+    val authors: String,
+    val description: String,
+    val pageCount: Int,
+    val thumbnail: String,
     val readPageCount: Int
 )
