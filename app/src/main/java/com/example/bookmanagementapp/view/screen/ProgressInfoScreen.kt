@@ -35,7 +35,9 @@ import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.viewmodel.ProgressInfoViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ProgressInfoScreen(
@@ -51,9 +53,11 @@ fun ProgressInfoScreen(
 
     ProgressLayout(
         book = book,
-        onSaveBookInfo = { _, _ ->
+        onSaveBookInfo = {
             viewModel.viewModelScope.launch {
-                viewModel.updateBookProgress(book.isbn)
+                withContext(Dispatchers.IO) {
+                    viewModel.updateBookProgress(book.isbn)
+                }
                 navController.navigate("bookList")
             }
         },
@@ -70,7 +74,7 @@ fun ProgressInfoScreen(
 @Composable
 fun ProgressLayout(
     book: BookInfoEntity,
-    onSaveBookInfo: (Int,Int) -> Unit,
+    onSaveBookInfo: () -> Unit,
     onReadPageCountChange: (Int) -> Unit,
     onPageCountChange: (Int) -> Unit,
     isNotOverPageCount: Boolean,
@@ -147,7 +151,7 @@ fun ProgressLayout(
 
         val isInputNotEmpty = readPageCount.isNotEmpty() && pageCount.isNotEmpty()
         ProgressInfoSaveButton(
-            onSaveBookInfo = { onSaveBookInfo(readPageCount.toInt(),pageCount.toInt())},
+            onSaveBookInfo = { onSaveBookInfo() },
             isNotEmpty = isNotOverPageCount && isInputNotEmpty,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
@@ -184,7 +188,7 @@ fun PreviewProgressInfoLayout() {
             thumbnail = "https://example.com/kotlin_start_book.jpg",
             readPageCount = 100
         ),
-        onSaveBookInfo = { _,_ -> },
+        onSaveBookInfo = { },
         onReadPageCountChange = {},
         onPageCountChange = {},
         isNotOverPageCount = true
