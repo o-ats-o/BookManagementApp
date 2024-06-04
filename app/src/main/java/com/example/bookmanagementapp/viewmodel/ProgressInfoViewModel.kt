@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,10 +27,9 @@ class ProgressInfoViewModel @Inject constructor(
     val isNotOverPageCount: StateFlow<Boolean> = _isNotOverPageCount
 
     init {
-
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) { // メインスレッドで実行
             combine(_readPageCount, _pageCount) { readPageCount, pageCount ->
-               readPageCount <= pageCount
+                readPageCount <= pageCount
             }.collect {
                 _isNotOverPageCount.value = it
             }
@@ -52,14 +53,18 @@ class ProgressInfoViewModel @Inject constructor(
     suspend fun updateBookProgress(isbn: String) {
         val readPageCount = _readPageCount.value
         val pageCount = _pageCount.value
-        val bookInfo = bookRepository.getBookInfo(isbn)
+        val bookInfo = withContext(Dispatchers.IO) { // IOスレッドでデータベースから書籍情報を取得
+            bookRepository.getBookInfo(isbn)
+        }
         if (bookInfo != null) {
             val updatedBookInfo = bookInfo.copy(
                 authors = bookInfo.authors,
                 readPageCount = readPageCount,
                 pageCount = pageCount
             )
-            bookRepository.saveBookInfo(updatedBookInfo)
+            withContext(Dispatchers.IO) { // IOスレッドでデータベースに書籍情報を保存
+                bookRepository.saveBookInfo(updatedBookInfo)
+            }
         }
     }
 }
