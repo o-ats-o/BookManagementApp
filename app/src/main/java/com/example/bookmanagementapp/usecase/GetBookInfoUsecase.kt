@@ -22,11 +22,11 @@ class GetBookInfoUseCaseImpl @Inject constructor(
             return bookResponse?.items?.get(0)?.volumeInfo?.let { volumeInfo ->
                 BookInfoEntity(
                     isbn = isbn,
-                    title = volumeInfo.title,
-                    authors = volumeInfo.authors?.joinToString(", "),
-                    description = volumeInfo.description,
-                    pageCount = volumeInfo.pageCount,
-                    thumbnail = volumeInfo.imageLinks?.thumbnail,
+                    title = volumeInfo.title ?: "",
+                    authors = volumeInfo.authors?.joinToString(",") ?: "",
+                    description = volumeInfo.description ?: "",
+                    pageCount = volumeInfo.pageCount ?: 0,
+                    thumbnail = volumeInfo.imageLinks?.thumbnail ?: "",
                     readPageCount = 0
                 )
             }
