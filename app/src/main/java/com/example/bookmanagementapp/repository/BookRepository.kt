@@ -11,6 +11,7 @@ import javax.inject.Inject
 interface BookRepository {
     suspend fun getBookInfo(isbn: String): BookInfoEntity?
     suspend fun saveBookInfo(bookInfo: BookInfoEntity)
+    suspend fun updateBookProgress(isbn: String, readPageCount: Int, pageCount: Int)
     fun getAllBooks(): Flow<List<BookInfoEntity>>
     suspend fun getBookInfoFromApi(query: String): Response<BookResponse>
 }
@@ -26,6 +27,10 @@ class BookRepositoryImpl @Inject constructor(
 
     override suspend fun saveBookInfo(bookInfo: BookInfoEntity) {
         bookDao.insertBook(bookInfo)
+    }
+
+    override suspend fun updateBookProgress(isbn: String, readPageCount: Int, pageCount: Int) {
+        bookDao.updateBookProgress(isbn, readPageCount, pageCount)
     }
 
     override fun getAllBooks(): Flow<List<BookInfoEntity>> {

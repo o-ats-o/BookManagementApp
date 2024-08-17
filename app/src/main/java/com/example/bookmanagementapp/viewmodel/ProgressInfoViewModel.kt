@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgressInfoViewModel @Inject constructor(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
 ) : ViewModel() {
 
     // readPageCountとpageCountの値を保持するStateFlowを追加
@@ -57,13 +57,8 @@ class ProgressInfoViewModel @Inject constructor(
             bookRepository.getBookInfo(isbn)
         }
         if (bookInfo != null) {
-            val updatedBookInfo = bookInfo.copy(
-                authors = bookInfo.authors,
-                readPageCount = readPageCount,
-                pageCount = pageCount
-            )
             withContext(Dispatchers.IO) { // IOスレッドでデータベースに書籍情報を保存
-                bookRepository.saveBookInfo(updatedBookInfo)
+                bookRepository.updateBookProgress(isbn, readPageCount, pageCount)
             }
         }
     }
