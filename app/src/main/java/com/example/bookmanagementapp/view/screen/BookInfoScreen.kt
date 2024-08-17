@@ -99,7 +99,7 @@ fun BookInfoScreen(
                 )
             }
             is BookInfoViewState.Error -> {
-
+                ErrorLayout(message = state.message)
             }
         }
     }
