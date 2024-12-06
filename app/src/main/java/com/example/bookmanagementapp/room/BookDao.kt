@@ -13,7 +13,11 @@ interface BookDao {
     suspend fun insertBook(book: BookInfoEntity)
 
     @Query("UPDATE book_info SET readPageCount = :readPageCount, pageCount = :pageCount WHERE isbn = :isbn")
-    suspend fun updateBookProgress(isbn: String, readPageCount: Int, pageCount: Int)
+    suspend fun updateBookProgress(
+        isbn: String,
+        readPageCount: Int,
+        pageCount: Int,
+    )
 
     @Query("SELECT * FROM book_info")
     fun getAllBooks(): Flow<List<BookInfoEntity>>

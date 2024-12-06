@@ -11,24 +11,29 @@ import retrofit2.http.Query
 private const val BASE_URL =
     "https://www.googleapis.com"
 
-//　Moshiのインスタンスを作成
+// 　Moshiのインスタンスを作成
 private val moshi =
-    Moshi.Builder()
-        .add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory())
-        .build()
+    Moshi
+        .Builder()
+        .add(
+            com.squareup.moshi.kotlin.reflect
+                .KotlinJsonAdapterFactory(),
+        ).build()
 
 // Retrofitのインスタンスを作成
-private val retrofit = Retrofit.Builder()
-    .baseUrl(BASE_URL)
-    .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .build()
+private val retrofit =
+    Retrofit
+        .Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
 
 val service: BookApiService = retrofit.create(BookApiService::class.java)
 
 interface BookApiService {
     @GET("books/v1/volumes")
     suspend fun getBookInfo(
-        @Query("q") query: String
+        @Query("q") query: String,
     ): Response<BookResponse>
 }
 

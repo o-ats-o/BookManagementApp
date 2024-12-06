@@ -36,22 +36,25 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     val navController = rememberNavController()
-                    val barcodeLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
-                        if (result.contents == null) {
-                            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG)
-                                .show()
-                        } else {
-                            if (result.contents.startsWith("97")) {
-                                navController.navigate("bookInformation/${result.contents}")
-                            } else {
-                                Toast.makeText(this, "Invalid ISBN", Toast.LENGTH_LONG)
+                    val barcodeLauncher =
+                        rememberLauncherForActivityResult(ScanContract()) { result ->
+                            if (result.contents == null) {
+                                Toast
+                                    .makeText(this, "Cancelled", Toast.LENGTH_LONG)
                                     .show()
+                            } else {
+                                if (result.contents.startsWith("97")) {
+                                    navController.navigate("bookInformation/${result.contents}")
+                                } else {
+                                    Toast
+                                        .makeText(this, "Invalid ISBN", Toast.LENGTH_LONG)
+                                        .show()
+                                }
                             }
                         }
-                    }
                     MainNavHost(navController = navController, barcodeLauncher = barcodeLauncher)
                 }
             }
@@ -59,10 +62,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainNavHost(
     navController: NavHostController,
-    barcodeLauncher: ActivityResultLauncher<ScanOptions>
+    barcodeLauncher: ActivityResultLauncher<ScanOptions>,
 ) {
     val viewModel: BookListViewModel = hiltViewModel()
     val allBooks by viewModel.allBooks.collectAsState()
@@ -79,7 +83,7 @@ fun MainNavHost(
             BookListScreen(
                 navController = navController,
                 barcodeLauncher = barcodeLauncher,
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(),
             )
         }
         composable("progressInfo/{isbn}") { backStackEntry ->
@@ -91,5 +95,3 @@ fun MainNavHost(
         }
     }
 }
-
-

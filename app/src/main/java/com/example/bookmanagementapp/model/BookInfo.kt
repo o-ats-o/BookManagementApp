@@ -6,12 +6,12 @@ import androidx.room.PrimaryKey
 data class BookResponse(
     val kind: String,
     val totalItems: Int,
-    val items: List<BookItem>
+    val items: List<BookItem>,
 )
 
 data class BookItem(
     val id: String,
-    val volumeInfo: BookInfo
+    val volumeInfo: BookInfo,
 )
 
 data class BookInfo(
@@ -23,7 +23,7 @@ data class BookInfo(
 )
 
 data class ImageLinks(
-    val thumbnail: String?
+    val thumbnail: String?,
 )
 
 @Entity(tableName = "book_info")
@@ -35,5 +35,5 @@ data class BookInfoEntity(
     val description: String,
     val pageCount: Int,
     val thumbnail: String,
-    val readPageCount: Int
+    val readPageCount: Int,
 )

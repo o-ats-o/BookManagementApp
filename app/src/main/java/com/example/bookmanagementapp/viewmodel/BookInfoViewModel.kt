@@ -15,75 +15,86 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BookInfoViewModel @Inject constructor(
-    private val bookRepository: BookRepository,
-    private val getBookInfoUseCase: GetBookInfoUseCase,
-) : ViewModel() {
-    private var job: Job? = null
+class BookInfoViewModel
+    @Inject
+    constructor(
+        private val bookRepository: BookRepository,
+        private val getBookInfoUseCase: GetBookInfoUseCase,
+    ) : ViewModel() {
+        private var job: Job? = null
 
-    private val _bookInfoState = MutableStateFlow<BookInfoViewState>(BookInfoViewState.Loading)
-    val bookInfoState: StateFlow<BookInfoViewState> = _bookInfoState
+        private val _bookInfoState = MutableStateFlow<BookInfoViewState>(BookInfoViewState.Loading)
+        val bookInfoState: StateFlow<BookInfoViewState> = _bookInfoState
 
-    fun getBookInfo(isbn: String) {
-        // 最新の書籍情報を取得するために前回のジョブをキャンセル
-        job?.cancel()
-        // APIから書籍情報を取得するのでIOスレッドで実行
-        job = viewModelScope.launch(Dispatchers.IO) {
-            _bookInfoState.value = BookInfoViewState.Loading
-            try {
-                val bookInfoEntity = getBookInfoUseCase.execute(isbn)
-                if (bookInfoEntity != null) {
-                    _bookInfoState.value = BookInfoViewState.Success(bookInfoEntity)
-                } else {
-                    throw Exception("Book info not found")
+        fun getBookInfo(isbn: String) {
+            // 最新の書籍情報を取得するために前回のジョブをキャンセル
+            job?.cancel()
+            // APIから書籍情報を取得するのでIOスレッドで実行
+            job =
+                viewModelScope.launch(Dispatchers.IO) {
+                    _bookInfoState.value = BookInfoViewState.Loading
+                    try {
+                        val bookInfoEntity = getBookInfoUseCase.execute(isbn)
+                        if (bookInfoEntity != null) {
+                            _bookInfoState.value = BookInfoViewState.Success(bookInfoEntity)
+                        } else {
+                            throw Exception("Book info not found")
+                        }
+                    } catch (exception: Exception) {
+                        _bookInfoState.value = BookInfoViewState.Error(exception.message ?: "Unknown error")
+                    }
                 }
-            } catch (exception: Exception) {
-                _bookInfoState.value = BookInfoViewState.Error(exception.message ?: "Unknown error")
+        }
+
+        // エラーメッセージを保持するStateFlowを追加
+        private val _errorMessage = MutableStateFlow<String?>(null)
+        val errorMessage: StateFlow<String?> = _errorMessage
+
+        fun saveBookInfoToLocalDatabase(
+            isbn: String,
+            bookInfo: BookInfo,
+            userEnteredTitle: String,
+            userEnteredAuthors: String,
+            userEnteredDescription: String,
+            userEnteredPageCount: String,
+        ) {
+            // 保存処理を実行するのでIOスレッドで実行
+            viewModelScope.launch(Dispatchers.IO) {
+                // IOスレッドで実行
+                val existingBook = bookRepository.getBookInfo(isbn)
+                if (existingBook == null) {
+                    val bookInfoEntity =
+                        BookInfoEntity(
+                            isbn = isbn,
+                            title = userEnteredTitle,
+                            authors = userEnteredAuthors,
+                            description = userEnteredDescription,
+                            pageCount = userEnteredPageCount.toInt(),
+                            thumbnail = bookInfo.imageLinks?.thumbnail ?: "",
+                            readPageCount = 0,
+                        )
+                    bookRepository.saveBookInfo(bookInfoEntity)
+                } else {
+                    // 書籍が既に存在するため、保存をスキップ
+                    // エラーメッセージを設定
+                    _errorMessage.value = "この書籍はすでに登録されています"
+                }
             }
         }
-    }
 
-    // エラーメッセージを保持するStateFlowを追加
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
-
-    fun saveBookInfoToLocalDatabase(
-        isbn: String,
-        bookInfo: BookInfo,
-        userEnteredTitle: String,
-        userEnteredAuthors: String,
-        userEnteredDescription: String,
-        userEnteredPageCount: String
-    ) {
-        // 保存処理を実行するのでIOスレッドで実行
-        viewModelScope.launch(Dispatchers.IO) { // IOスレッドで実行
-            val existingBook = bookRepository.getBookInfo(isbn)
-            if (existingBook == null) {
-                val bookInfoEntity = BookInfoEntity(
-                    isbn = isbn,
-                    title = userEnteredTitle,
-                    authors = userEnteredAuthors,
-                    description = userEnteredDescription,
-                    pageCount = userEnteredPageCount.toInt(),
-                    thumbnail = bookInfo.imageLinks?.thumbnail ?: "",
-                    readPageCount = 0
-                )
-                bookRepository.saveBookInfo(bookInfoEntity)
-            } else {
-                // 書籍が既に存在するため、保存をスキップ
-                // エラーメッセージを設定
-                _errorMessage.value = "この書籍はすでに登録されています"
-            }
+        fun clearErrorMessage() {
+            _errorMessage.value = null
         }
     }
-
-    fun clearErrorMessage() {
-        _errorMessage.value = null
-    }
-}
 
 sealed class BookInfoViewState {
     data object Loading : BookInfoViewState()
-    data class Success(val data: BookInfoEntity) : BookInfoViewState()
-    data class Error(val message: String) : BookInfoViewState()
+
+    data class Success(
+        val data: BookInfoEntity,
+    ) : BookInfoViewState()
+
+    data class Error(
+        val message: String,
+    ) : BookInfoViewState()
 }

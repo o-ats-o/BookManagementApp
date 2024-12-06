@@ -14,9 +14,5 @@ import javax.inject.Singleton
 object UseCaseModule {
     @Provides
     @Singleton
-    fun provideGetBookInfoUseCase(
-        bookRepository: BookRepository
-    ): GetBookInfoUseCase {
-        return GetBookInfoUseCaseImpl(bookRepository)
-    }
+    fun provideGetBookInfoUseCase(bookRepository: BookRepository): GetBookInfoUseCase = GetBookInfoUseCaseImpl(bookRepository)
 }

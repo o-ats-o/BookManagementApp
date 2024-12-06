@@ -1,5 +1,6 @@
 package com.example.bookmanagementapp.view.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -46,13 +47,14 @@ import com.example.bookmanagementapp.viewmodel.BookInfoViewState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun BookInfoScreen(
     modifier: Modifier = Modifier,
     isbn: String,
     navController: NavHostController,
     viewModel: BookInfoViewModel = hiltViewModel(),
-){
+) {
     val bookInfoState = viewModel.bookInfoState.collectAsState()
     val errorMessage = viewModel.errorMessage.collectAsState()
 
@@ -70,14 +72,16 @@ fun BookInfoScreen(
     }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
         when (val state = bookInfoState.value) {
             is BookInfoViewState.Loading -> {
                 CircularProgressIndicator()
             }
+
             is BookInfoViewState.Success -> {
                 val bookInfo = mapBookInfoEntityToBookInfo(state.data)
                 BookInfoLayout(
@@ -90,14 +94,15 @@ fun BookInfoScreen(
                                 userEnteredTitle,
                                 userEnteredAuthors,
                                 userEnteredDescription,
-                                userEnteredPageCount
+                                userEnteredPageCount,
                             )
                             delay(1200)
                             navController.navigate("isbnScanner")
                         }
-                    }
+                    },
                 )
             }
+
             is BookInfoViewState.Error -> {
                 ErrorLayout(message = state.message)
             }
@@ -105,26 +110,28 @@ fun BookInfoScreen(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 // 書籍情報のレイアウト
 @Composable
 fun BookInfoLayout(
     bookInfo: BookInfo?,
     onSaveBookInfo: (String, String, String, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     // 書籍情報の各項目を保持する
-    val title = remember { mutableStateOf(bookInfo?.title?: "") }
+    val title = remember { mutableStateOf(bookInfo?.title ?: "") }
     val authors = remember { mutableStateOf(bookInfo?.authors?.joinToString(", ") ?: "") }
-    val description = remember { mutableStateOf(bookInfo?.description?: "") }
-    val pageCount = remember { mutableStateOf(bookInfo?.pageCount?.toString()?: "") }
+    val description = remember { mutableStateOf(bookInfo?.description ?: "") }
+    val pageCount = remember { mutableStateOf(bookInfo?.pageCount?.toString() ?: "") }
 
     // 全てのテキストフィールドが空でないかどうか
-    val isNotEmpty = title.value.isNotEmpty() && authors.value.isNotEmpty() && description.value.isNotEmpty() && pageCount.value.isNotEmpty()
+    val isNotEmpty =
+        title.value.isNotEmpty() && authors.value.isNotEmpty() && description.value.isNotEmpty() && pageCount.value.isNotEmpty()
 
-    LazyColumn (
-        modifier = modifier
-            .padding(top = 24.dp, start = 18.dp, end = 18.dp)
+    LazyColumn(
+        modifier =
+            modifier
+                .padding(top = 24.dp, start = 18.dp, end = 18.dp),
     ) {
         item { BookCover(bookInfo?.imageLinks) }
         item { Spacer(modifier = Modifier.height(32.dp)) }
@@ -136,49 +143,57 @@ fun BookInfoLayout(
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { BookField(pageCount, "総ページ数") { newValue -> pageCount.value = newValue } }
         item { Spacer(modifier = Modifier.height(38.dp)) }
-        item { BookInfoSaveButton(isNotEmpty, {
-            onSaveBookInfo( title.value, authors.value, description.value, pageCount.value)
-        }) }
+        item {
+            BookInfoSaveButton(isNotEmpty, {
+                onSaveBookInfo(title.value, authors.value, description.value, pageCount.value)
+            })
+        }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 // 書籍の表紙画像
 @Composable
 fun BookCover(
     imageLinks: ImageLinks?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     imageLinks?.let { links ->
         Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ){
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
             Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = links.thumbnail).apply(block = fun ImageRequest.Builder.() {
-                            transformations(RoundedCornersTransformation(10f))
-                        }).build(),
-                ),
+                painter =
+                    rememberAsyncImagePainter(
+                        ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(data = links.thumbnail)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                transformations(RoundedCornersTransformation(10f))
+                            })
+                            .build(),
+                    ),
                 contentDescription = "Book cover image",
                 modifier
                     .height(240.dp)
                     .width(160.dp)
                     .fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
-
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 // 書籍情報のテキストフィールド
 @Composable
 fun BookField(
     value: MutableState<String>,
     label: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
 ) {
     // テキストフィールドの入力状態を保持する
     val (text, setText) = remember { mutableStateOf(value.value) }
@@ -190,38 +205,42 @@ fun BookField(
                 onValueChange(it)
             },
             label = { Text(label) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp),
             trailingIcon = {
                 if (text.isEmpty()) {
                     Icon(
                         imageVector = Icons.Default.Error,
                         contentDescription = "Error",
-                        tint = Color.Red
+                        tint = Color.Red,
                     )
                 }
             },
             // テキストフィールドに1文字も入っていない時，テキストフィールドの下線を赤く，それ以外は元々の色
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
-                unfocusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
-            )
+            colors =
+                TextFieldDefaults.colors(
+                    focusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
+                    unfocusedIndicatorColor = if (text.isEmpty()) Color.Red else Color.Gray,
+                ),
         )
 
         // 入力が空の場合に警告メッセージを表示する
         if (text.isEmpty()) {
             Text(
                 text = "1文字以上のテキストを入力してください",
-                modifier = Modifier
-                    .padding(top = 4.dp, start = 8.dp),
+                modifier =
+                    Modifier
+                        .padding(top = 4.dp, start = 8.dp),
                 fontSize = 12.sp,
-                color = Color.Red
+                color = Color.Red,
             )
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 // 書籍情報保存ボタン
 @Composable
 fun BookInfoSaveButton(
@@ -230,67 +249,75 @@ fun BookInfoSaveButton(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
         Button(
             onClick = { onSaveBookInfo() },
-            modifier = modifier
-                .width(120.dp)
-                .height(40.dp),
-            enabled = isNotEmpty
+            modifier =
+                modifier
+                    .width(120.dp)
+                    .height(40.dp),
+            enabled = isNotEmpty,
         ) {
             Text("保存")
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 // エラー画面のレイアウト
 @Composable
 fun ErrorLayout(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    Log.d("ErrorLayout", "message: $message")
     Box(
-        modifier = modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = message,
             modifier = modifier.padding(16.dp),
-            fontSize = 16.sp
+            fontSize = 16.sp,
         )
     }
 }
 
-fun mapBookInfoEntityToBookInfo(bookInfoEntity: BookInfoEntity): BookInfo {
-    return BookInfo(
+fun mapBookInfoEntityToBookInfo(bookInfoEntity: BookInfoEntity): BookInfo =
+    BookInfo(
         title = bookInfoEntity.title,
         authors = bookInfoEntity.authors.split(", "),
         description = bookInfoEntity.description,
         pageCount = bookInfoEntity.pageCount,
-        imageLinks = ImageLinks(thumbnail = bookInfoEntity.thumbnail)
+        imageLinks = ImageLinks(thumbnail = bookInfoEntity.thumbnail),
     )
-}
 
+@Suppress("ktlint:standard:function-naming")
 // 書籍情報レイアウトのプレビュー
 @Preview
 @Composable
 fun PreviewBookInfoLayout() {
-val bookInfo = BookInfo(
-        title = "タイトル",
-        authors = listOf("著者1", "著者2"),
-        description = "書籍概要",
-        pageCount = 100,
-        imageLinks = ImageLinks(
-            thumbnail = ""
+    val bookInfo =
+        BookInfo(
+            title = "タイトル",
+            authors = listOf("著者1", "著者2"),
+            description = "書籍概要",
+            pageCount = 100,
+            imageLinks =
+                ImageLinks(
+                    thumbnail = "",
+                ),
         )
-    )
     BookInfoLayout(bookInfo, onSaveBookInfo = { _, _, _, _ -> })
 }
 
+@Suppress("ktlint:standard:function-naming")
 // エラーレイアウトのプレビュー
 @Preview
 @Composable

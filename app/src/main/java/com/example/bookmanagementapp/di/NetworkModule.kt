@@ -11,7 +11,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBookApiService(): BookApiService {
-        return service
-    }
+    fun provideBookApiService(): BookApiService = service
 }
