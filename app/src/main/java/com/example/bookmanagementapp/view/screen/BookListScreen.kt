@@ -122,7 +122,8 @@ fun BookItemCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text( // 著者情報を表示するTextコンポーネントを追加
+                Text(
+                    // 著者情報を表示するTextコンポーネントを追加
                     text = book.authors,
                     modifier = Modifier.padding(start = 6.dp, end = 6.dp),
                     fontSize = 14.sp,
@@ -149,6 +150,8 @@ fun BookItemCard(
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = Color.Gray,
                     strokeCap = StrokeCap.Round,
+                    gapSize = 0.dp,
+                    drawStopIndicator = {},
                 )
             }
         }
