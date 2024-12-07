@@ -17,7 +17,7 @@ class GetBookInfoUseCaseImpl
     ) : GetBookInfoUseCase {
         override suspend fun execute(isbn: String): BookInfoEntity? {
             // Google Books APIから書籍情報を取得
-            val response = bookRepository.getBookInfoFromApi("isbn:$isbn")
+            val response = bookRepository.getBookInfoFromApi(isbn)
             if (response.isSuccessful) {
                 // レスポンスからBookInfoEntityを作成して返す
                 val bookResponse = response.body()
