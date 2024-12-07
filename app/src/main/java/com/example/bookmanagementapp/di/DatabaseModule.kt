@@ -14,11 +14,14 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
     @Provides
-    fun provideBookDao(@ApplicationContext context: Context): BookDao {
-        return Room.databaseBuilder(
-            context,
-            BookDatabase::class.java,
-            "database-name"
-        ).build().bookDao()
-    }
+    fun provideBookDao(
+        @ApplicationContext context: Context,
+    ): BookDao =
+        Room
+            .databaseBuilder(
+                context,
+                BookDatabase::class.java,
+                "database-name",
+            ).build()
+            .bookDao()
 }

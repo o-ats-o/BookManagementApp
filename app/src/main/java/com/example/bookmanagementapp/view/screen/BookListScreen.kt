@@ -38,34 +38,37 @@ import com.example.bookmanagementapp.model.BookInfoEntity
 import com.example.bookmanagementapp.viewmodel.BookListViewModel
 import com.journeyapps.barcodescanner.ScanOptions
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun BookListScreen(
     viewModel: BookListViewModel = hiltViewModel(),
     navController: NavController,
-    barcodeLauncher: ActivityResultLauncher<ScanOptions>
+    barcodeLauncher: ActivityResultLauncher<ScanOptions>,
 ) {
     val readingProgress = viewModel.readingProgress.collectAsState()
 
     Scaffold(
         floatingActionButton = {
-            val scanOptions = ScanOptions().apply {
-                setCaptureActivity(CustomScannerActivity::class.java)
-                setOrientationLocked(false)
-                setPrompt("")
-            }
+            val scanOptions =
+                ScanOptions().apply {
+                    setCaptureActivity(CustomScannerActivity::class.java)
+                    setOrientationLocked(false)
+                    setPrompt("")
+                }
             FloatingActionButton(
                 onClick = { barcodeLauncher.launch(scanOptions) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
+                modifier = Modifier.padding(end = 16.dp, bottom = 16.dp),
             ) {
                 Icon(
-                    Icons.Default.Add, contentDescription = "Add"
+                    Icons.Default.Add,
+                    contentDescription = "Add",
                 )
             }
-        }
+        },
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             items(readingProgress.value.size) { index ->
                 val (book, progress) = readingProgress.value[index]
@@ -76,36 +79,39 @@ fun BookListScreen(
                     modifier = Modifier.padding(8.dp),
                     onBookClick = {
                         navController.navigate("progressInfo/${book.isbn}")
-                    }
+                    },
                 )
             }
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun BookItemCard(
     modifier: Modifier = Modifier,
     book: BookInfoEntity,
     progress: Float,
-    onBookClick: (BookInfoEntity) -> Unit = {}
-){
+    onBookClick: (BookInfoEntity) -> Unit = {},
+) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp)
-            .clickable {
-                onBookClick(book)
-            }
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp)
+                .clickable {
+                    onBookClick(book)
+                },
     ) {
         Row {
             Image(
                 painter = rememberAsyncImagePainter(model = book.thumbnail),
                 contentDescription = "Book thumbnail",
-                modifier = Modifier
-                    .height(130.dp)
-                    .width(90.dp)
-                    .padding(start = 10.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
+                modifier =
+                    Modifier
+                        .height(130.dp)
+                        .width(90.dp)
+                        .padding(start = 10.dp, end = 5.dp, top = 5.dp, bottom = 5.dp),
             )
             Column {
                 Text(
@@ -114,52 +120,59 @@ fun BookItemCard(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
-                Text( // 著者情報を表示するTextコンポーネントを追加
+                Text(
+                    // 著者情報を表示するTextコンポーネントを追加
                     text = book.authors,
                     modifier = Modifier.padding(start = 6.dp, end = 6.dp),
                     fontSize = 14.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = "${(progress * 100).toInt()}%",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(end = 26.dp)
-                        .align(Alignment.End)
+                    modifier =
+                        Modifier
+                            .padding(end = 26.dp)
+                            .align(Alignment.End),
                 )
                 // 進捗状況を示すLinearProgressIndicatorを追加
                 LinearProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier
-                        .padding(start = 12.dp, end = 28.dp, top = 12.dp)
-                        .height(7.dp)
-                        .fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .padding(start = 12.dp, end = 28.dp, top = 12.dp)
+                            .height(7.dp)
+                            .fillMaxWidth(),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = Color.Gray,
-                    strokeCap = StrokeCap.Round
+                    strokeCap = StrokeCap.Round,
+                    gapSize = 0.dp,
+                    drawStopIndicator = {},
                 )
             }
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview
 @Composable
-fun PreviewBookItemCard(){
+fun PreviewBookItemCard() {
     BookItemCard(
-        book = BookInfoEntity(
-            isbn = "9784774194310",
-            title = "タイトル",
-            authors = "著者",
-            description = "説明",
-            pageCount = 100,
-            thumbnail = "https://books.google.com/books/content?id=1l8qAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-            readPageCount = 100
-        ),
-        progress = 0.5f
+        book =
+            BookInfoEntity(
+                isbn = "9784774194310",
+                title = "タイトル",
+                authors = "著者",
+                description = "説明",
+                pageCount = 100,
+                thumbnail = "https://books.google.com/books/content?id=1l8qAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+                readPageCount = 100,
+            ),
+        progress = 0.5f,
     )
 }

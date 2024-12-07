@@ -1,9 +1,9 @@
 package com.example.bookmanagementapp.di
 
-import com.example.bookmanagementapp.room.BookDao
 import com.example.bookmanagementapp.network.BookApiService
 import com.example.bookmanagementapp.repository.BookRepository
 import com.example.bookmanagementapp.repository.BookRepositoryImpl
+import com.example.bookmanagementapp.room.BookDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,8 +17,6 @@ object RepositoryModule {
     @Singleton
     fun provideBookRepository(
         bookDao: BookDao,
-        bookApiService: BookApiService
-    ): BookRepository {
-        return BookRepositoryImpl(bookDao, bookApiService)
-    }
+        bookApiService: BookApiService,
+    ): BookRepository = BookRepositoryImpl(bookDao, bookApiService)
 }

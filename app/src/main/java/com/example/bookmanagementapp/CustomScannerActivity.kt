@@ -11,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.journeyapps.barcodescanner.CaptureManager
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.ViewfinderView
-import java.util.*
+import java.util.Random
 
-class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchListener {
+class CustomScannerActivity :
+    AppCompatActivity(),
+    DecoratedBarcodeView.TorchListener {
     private lateinit var capture: CaptureManager
     private lateinit var barcodeScannerView: DecoratedBarcodeView
     private lateinit var switchFlashlightButton: Button
@@ -23,10 +25,13 @@ class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_scanner)
 
-        barcodeScannerView = findViewById(R.id.zxing_barcode_scanner) ?: throw RuntimeException("No view with ID zxing_barcode_scanner found")
+        barcodeScannerView =
+            findViewById(R.id.zxing_barcode_scanner)
+                ?: throw RuntimeException("No view with ID zxing_barcode_scanner found")
         barcodeScannerView.setTorchListener(this)
 
-        viewfinderView = findViewById(R.id.zxing_viewfinder_view) ?: throw RuntimeException("No view with ID zxing_viewfinder_view found")
+        viewfinderView = findViewById(R.id.zxing_viewfinder_view)
+            ?: throw RuntimeException("No view with ID zxing_viewfinder_view found")
 
         // if the device does not have flashlight in its camera,
         // then remove the switch flashlight button...
@@ -63,9 +68,10 @@ class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchLis
         capture.onSaveInstanceState(outState)
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        return barcodeScannerView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
-    }
+    override fun onKeyDown(
+        keyCode: Int,
+        event: KeyEvent,
+    ): Boolean = barcodeScannerView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
 
     private fun changeMaskColor() {
         val rnd = Random()
@@ -77,7 +83,11 @@ class CustomScannerActivity : AppCompatActivity(), DecoratedBarcodeView.TorchLis
         viewfinderView.setLaserVisibility(visible)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         capture.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }

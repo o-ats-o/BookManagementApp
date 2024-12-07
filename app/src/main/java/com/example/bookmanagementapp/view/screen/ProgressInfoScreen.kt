@@ -39,11 +39,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ProgressInfoScreen(
     book: BookInfoEntity,
     navController: NavController,
-    viewModel: ProgressInfoViewModel = hiltViewModel()
+    viewModel: ProgressInfoViewModel = hiltViewModel(),
 ) {
     val isNotOverPageCount = viewModel.isNotOverPageCount.collectAsState().value
 
@@ -67,10 +68,11 @@ fun ProgressInfoScreen(
         onPageCountChange = { newPageCount ->
             viewModel.updatePageCount(newPageCount)
         },
-        isNotOverPageCount = isNotOverPageCount
+        isNotOverPageCount = isNotOverPageCount,
     )
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ProgressLayout(
     book: BookInfoEntity,
@@ -83,29 +85,33 @@ fun ProgressLayout(
     var pageCount by remember { mutableStateOf(book.pageCount.toString()) }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
     ) {
         Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(book.thumbnail)
-                    .transformations(RoundedCornersTransformation(4f))
-                    .build()
-            ),
+            painter =
+                rememberAsyncImagePainter(
+                    ImageRequest
+                        .Builder(LocalContext.current)
+                        .data(book.thumbnail)
+                        .transformations(RoundedCornersTransformation(4f))
+                        .build(),
+                ),
             contentDescription = "Book thumbnail",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .height(240.dp)
-                .width(160.dp)
-                .align(Alignment.CenterHorizontally)
+            modifier =
+                Modifier
+                    .height(240.dp)
+                    .width(160.dp)
+                    .align(Alignment.CenterHorizontally),
         )
         Spacer(modifier = Modifier.padding(top = 28.dp))
         Text(
             text = book.title,
             fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.padding(top = 2.dp))
         Text(
@@ -127,7 +133,7 @@ fun ProgressLayout(
             },
             label = { Text("現在のページ数") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.padding(top = 28.dp))
         TextField(
@@ -144,53 +150,56 @@ fun ProgressLayout(
             },
             label = { Text("総ページ数") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.padding(top = 60.dp))
-
 
         val isInputNotEmpty = readPageCount.isNotEmpty() && pageCount.isNotEmpty()
         ProgressInfoSaveButton(
             onSaveBookInfo = { onSaveBookInfo() },
             isNotEmpty = isNotOverPageCount && isInputNotEmpty,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ProgressInfoSaveButton(
     modifier: Modifier = Modifier,
     onSaveBookInfo: () -> Unit,
-    isNotEmpty: Boolean
+    isNotEmpty: Boolean,
 ) {
     Button(
         onClick = onSaveBookInfo,
-        modifier = modifier
-            .width(120.dp)
-            .height(40.dp),
-        enabled = isNotEmpty
+        modifier =
+            modifier
+                .width(120.dp)
+                .height(40.dp),
+        enabled = isNotEmpty,
     ) {
         Text("保存")
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview
 @Composable
 fun PreviewProgressInfoLayout() {
     ProgressLayout(
-        book = BookInfoEntity(
-            isbn = "978-4-7741-9231-1",
-            title = "Kotlinスタートブック",
-            authors = "渡辺 竜王",
-            description = "Kotlinの基本から応用までを網羅した解説書",
-            pageCount = 360,
-            thumbnail = "https://example.com/kotlin_start_book.jpg",
-            readPageCount = 100
-        ),
+        book =
+            BookInfoEntity(
+                isbn = "978-4-7741-9231-1",
+                title = "Kotlinスタートブック",
+                authors = "渡辺 竜王",
+                description = "Kotlinの基本から応用までを網羅した解説書",
+                pageCount = 360,
+                thumbnail = "https://example.com/kotlin_start_book.jpg",
+                readPageCount = 100,
+            ),
         onSaveBookInfo = { },
         onReadPageCountChange = {},
         onPageCountChange = {},
-        isNotOverPageCount = true
+        isNotOverPageCount = true,
     )
 }

@@ -14,31 +14,36 @@ import androidx.navigation.NavController
 import com.example.bookmanagementapp.view.screen.BookListScreen
 import com.journeyapps.barcodescanner.ScanContract
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun IsbnScanner(navController: NavController) {
     val context = LocalContext.current
-    val barcodeLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
-        if (result.contents == null) {
-            Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG)
-                .show()
-        } else {
-            if (result.contents.startsWith("97")) {
-                navController.navigate("bookInformation/${result.contents}")
-            } else {
-                Toast.makeText(context, "Invalid ISBN", Toast.LENGTH_LONG)
+    val barcodeLauncher =
+        rememberLauncherForActivityResult(ScanContract()) { result ->
+            if (result.contents == null) {
+                Toast
+                    .makeText(context, "Cancelled", Toast.LENGTH_LONG)
                     .show()
+            } else {
+                if (result.contents.startsWith("97")) {
+                    navController.navigate("bookInformation/${result.contents}")
+                } else {
+                    Toast
+                        .makeText(context, "Invalid ISBN", Toast.LENGTH_LONG)
+                        .show()
+                }
             }
         }
-    }
     Scaffold { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             BookListScreen(
                 navController = navController,
-                barcodeLauncher = barcodeLauncher
+                barcodeLauncher = barcodeLauncher,
             )
         }
     }
